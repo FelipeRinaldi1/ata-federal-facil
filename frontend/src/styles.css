@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --brand-forest: #22863a;
+    --brand-forest-hover: #1e7533;
+    --brand-ruby: #b91c1c;
+  }
+}
