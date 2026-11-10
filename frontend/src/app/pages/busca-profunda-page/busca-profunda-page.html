@@ -259,7 +259,7 @@
 
     <!-- Tabela Corporativa Paginada de Itens -->
     <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-x-auto shadow-xs">
-      <table class="w-full text-left text-xs border-collapse">
+      <table class="w-full text-left text-xs border-collapse table-fixed min-w-[900px]">
         <thead class="bg-neutral-50 dark:bg-neutral-800/80 border-b border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 select-none">
           <tr>
             <th 
@@ -270,22 +270,26 @@
             >
               <div class="flex items-center gap-1">
                 <span>Nº</span>
-                @if (ordenacaoColuna() === 'numero') {
-                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
-                }
+                <span class="inline-block w-3 text-[10px] text-neutral-800 dark:text-neutral-200">
+                  @if (ordenacaoColuna() === 'numero') {
+                    {{ ordenacaoAsc() ? '▲' : '▼' }}
+                  }
+                </span>
               </div>
             </th>
             <th 
               scope="col" 
               (click)="mudarOrdenacao('descricao')"
-              class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white min-w-[280px]"
+              class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white w-[42%]"
               title="Clique para ordenar alfabeticamente pela descrição do item (A-Z ou Z-A)"
             >
               <div class="flex items-center gap-1">
                 <span>Descrição do Item</span>
-                @if (ordenacaoColuna() === 'descricao') {
-                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
-                }
+                <span class="inline-block w-3 text-[10px] text-neutral-800 dark:text-neutral-200">
+                  @if (ordenacaoColuna() === 'descricao') {
+                    {{ ordenacaoAsc() ? '▲' : '▼' }}
+                  }
+                </span>
               </div>
             </th>
             <th 
@@ -296,9 +300,11 @@
             >
               <div class="flex items-center justify-end gap-1">
                 <span>Qtd / Unid</span>
-                @if (ordenacaoColuna() === 'quantidade') {
-                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
-                }
+                <span class="inline-block w-3 text-[10px] text-neutral-800 dark:text-neutral-200">
+                  @if (ordenacaoColuna() === 'quantidade') {
+                    {{ ordenacaoAsc() ? '▲' : '▼' }}
+                  }
+                </span>
               </div>
             </th>
             <th 
@@ -309,22 +315,26 @@
             >
               <div class="flex items-center justify-end gap-1">
                 <span>Valor Total</span>
-                @if (ordenacaoColuna() === 'valorTotal') {
-                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
-                }
+                <span class="inline-block w-3 text-[10px] text-neutral-800 dark:text-neutral-200">
+                  @if (ordenacaoColuna() === 'valorTotal') {
+                    {{ ordenacaoAsc() ? '▲' : '▼' }}
+                  }
+                </span>
               </div>
             </th>
             <th 
               scope="col" 
               (click)="mudarOrdenacao('orgao')"
-              class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white min-w-[220px]"
+              class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white w-[30%]"
               title="Clique para ordenar alfabeticamente por órgão"
             >
               <div class="flex items-center gap-1">
                 <span>Órgão Licitante (Edital)</span>
-                @if (ordenacaoColuna() === 'orgao') {
-                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
-                }
+                <span class="inline-block w-3 text-[10px] text-neutral-800 dark:text-neutral-200">
+                  @if (ordenacaoColuna() === 'orgao') {
+                    {{ ordenacaoAsc() ? '▲' : '▼' }}
+                  }
+                </span>
               </div>
             </th>
             <th scope="col" class="py-2.5 px-3 font-semibold w-24 text-center">
@@ -335,10 +345,10 @@
         <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
           @for (item of itensPaginados(); track item.cnpj + '_' + item.ano + '_' + item.seqCompra + '_' + item.numeroItem) {
             <tr class="hover:bg-neutral-50/70 dark:hover:bg-neutral-800/40 transition-colors">
-              <td class="py-2.5 px-3 font-mono font-medium text-neutral-700 dark:text-neutral-300">
+              <td class="py-2.5 px-3 font-mono font-medium text-neutral-700 dark:text-neutral-300 align-top">
                 #{{ item.numeroItem }}
               </td>
-              <td class="py-2.5 px-3 leading-relaxed text-neutral-800 dark:text-neutral-200">
+              <td class="py-2.5 px-3 leading-relaxed text-neutral-800 dark:text-neutral-200 align-top break-words">
                 <div [innerHTML]="destacarTermo(item.descricao, termoItem() || termoObjeto())"></div>
                 @if (item.situacaoCompraItemNome) {
                   <span class="inline-block mt-0.5 text-[10px] text-neutral-500 font-mono">
@@ -346,11 +356,11 @@
                   </span>
                 }
               </td>
-              <td class="py-2.5 px-3 text-right text-neutral-700 dark:text-neutral-300 whitespace-nowrap">
+              <td class="py-2.5 px-3 text-right text-neutral-700 dark:text-neutral-300 whitespace-nowrap align-top">
                 <span class="font-semibold">{{ item.quantidade || '-' }}</span>
                 <span class="text-[11px] text-neutral-500 block">{{ item.unidadeMedida || '' }}</span>
               </td>
-              <td class="py-2.5 px-3 text-right font-medium text-neutral-800 dark:text-neutral-200 whitespace-nowrap">
+              <td class="py-2.5 px-3 text-right font-medium text-neutral-800 dark:text-neutral-200 whitespace-nowrap align-top">
                 @if (item.valorTotalHomologado || item.valorTotal) {
                   <span>{{ (item.valorTotalHomologado || item.valorTotal) | currency:'BRL':'symbol':'1.2-2' }}</span>
                   @if (item.valorUnitarioHomologado || item.valorUnitarioEstimado) {
@@ -362,11 +372,11 @@
                   <span class="text-neutral-400">-</span>
                 }
               </td>
-              <td class="py-2.5 px-3 text-neutral-700 dark:text-neutral-300 leading-snug">
+              <td class="py-2.5 px-3 text-neutral-700 dark:text-neutral-300 leading-snug align-top break-words">
                 <div class="font-medium text-neutral-900 dark:text-neutral-100">
                   {{ item.nomeOrgao }}
                 </div>
-                <div class="text-[11px] text-neutral-500 flex items-center gap-1.5 mt-0.5">
+                <div class="text-[11px] text-neutral-500 flex items-center gap-1.5 mt-0.5 flex-wrap">
                   <span class="font-mono">CNPJ {{ item.cnpjFormatado }}</span>
                   @if (item.uf) {
                     <span>· UF: {{ item.uf }}</span>
@@ -374,7 +384,7 @@
                   <span>· Ano {{ item.ano }}</span>
                 </div>
               </td>
-              <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <td class="py-2.5 px-3 text-center whitespace-nowrap align-top">
                 <a 
                   [routerLink]="['/edital', item.cnpj, item.ano, item.seqCompra]"
                   class="inline-block px-2 py-1 text-[11px] font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded transition"
