@@ -37,14 +37,14 @@
     </div>
   </div>
 
-  <!-- Painel de Configuração da Varredura -->
+  <!-- Painel de Configuração da Varredura (Mesmos filtros da Busca de Editais) -->
   <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 shadow-xs">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
       
       <!-- Termo do Item -->
-      <div class="sm:col-span-2 lg:col-span-6">
+      <div class="sm:col-span-2 lg:col-span-4">
         <label for="campo-termo-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-          Nome ou Descrição do Item Desejado <span class="text-red-500">*</span>
+          Nome ou Descrição do Item <span class="text-red-500">*</span>
         </label>
         <input 
           id="campo-termo-profundo"
@@ -75,31 +75,60 @@
         </select>
       </div>
 
-      <!-- Quantidade de Editais a Varrer -->
+      <!-- Data Inicial -->
       <div class="lg:col-span-2">
-        <label for="campo-escopo-editais" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de editais federais para inspecionar os itens">
-          Profundidade
+        <label for="campo-data-inicial-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Publicado a partir de
+        </label>
+        <input 
+          id="campo-data-inicial-profundo"
+          type="date" 
+          [ngModel]="dataInicial()"
+          (ngModelChange)="dataInicial.set($event)"
+          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+        />
+      </div>
+
+      <!-- Data Final -->
+      <div class="lg:col-span-2">
+        <label for="campo-data-final-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Publicado até
+        </label>
+        <input 
+          id="campo-data-final-profundo"
+          type="date" 
+          [ngModel]="dataFinal()"
+          (ngModelChange)="dataFinal.set($event)"
+          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+        />
+      </div>
+
+      <!-- Profundidade da Busca (Páginas de Atas no PNCP) -->
+      <div class="lg:col-span-1">
+        <label for="campo-escopo-editais" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 atas no PNCP">
+          Páginas
         </label>
         <select 
           id="campo-escopo-editais"
-          [ngModel]="limiteEditais()"
-          (ngModelChange)="limiteEditais.set($event)"
-          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          [ngModel]="totalPaginas()"
+          (ngModelChange)="totalPaginas.set($event)"
+          class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
         >
-          <option [ngValue]="10">10 editais (~rápida)</option>
-          <option [ngValue]="20">20 editais (~padrão)</option>
-          <option [ngValue]="30">30 editais (~ampla)</option>
-          <option [ngValue]="50">50 editais (~extensiva)</option>
+          <option [ngValue]="5">5 (~100)</option>
+          <option [ngValue]="10">10 (~200)</option>
+          <option [ngValue]="15">15 (~300)</option>
+          <option [ngValue]="25">25 (~500)</option>
+          <option [ngValue]="50">50 (~1k)</option>
         </select>
       </div>
 
       <!-- Botão Ação -->
-      <div class="lg:col-span-2 flex items-center gap-2">
+      <div class="lg:col-span-1 flex items-end">
         @if (emExecucao()) {
           <button 
             type="button"
             (click)="cancelarVarredura()"
-            class="w-full py-2 px-3 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-semibold rounded transition cursor-pointer"
+            class="w-full py-2 px-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-semibold rounded transition cursor-pointer"
           >
             Parar
           </button>
@@ -107,12 +136,12 @@
           <button 
             type="button"
             (click)="iniciarVarredura()"
-            class="w-full py-2 px-3 bg-[#22863a] hover:bg-[#1e7533] active:scale-[0.98] text-white text-xs font-semibold rounded shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22863a]"
+            class="w-full py-2 px-2 bg-[#22863a] hover:bg-[#1e7533] active:scale-[0.98] text-white text-xs font-semibold rounded shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22863a]"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-            <span>Iniciar Busca</span>
+            <span>Buscar</span>
           </button>
         }
       </div>

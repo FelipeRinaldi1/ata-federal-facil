@@ -34,7 +34,9 @@ export class BuscaProfundaPage {
   // Parâmetros de Busca
   termoBusca = signal<string>('');
   filtroUf = signal<string>('');
-  limiteEditais = signal<number>(20); // 10, 20, 30, 50
+  dataInicial = signal<string>('');
+  dataFinal = signal<string>('');
+  totalPaginas = signal<number>(5); // 5 (~100 atas), 10 (~200), 15 (~300), 25 (~500), 50 (~1k)
 
   // Estado da Varredura
   emExecucao = signal<boolean>(false);
@@ -148,27 +150,23 @@ export class BuscaProfundaPage {
     this.paginaAtual.set(1);
     this.mensagemStatus.set('Consultando atas e editais federais vigentes...');
 
-    // Passo 1: Busca editais do PNCP (esfera Federal, vigentes, carona=Sim)
-    // Calculamos quantas páginas do PNCP buscar para atingir a meta de editais
-    const paginasPncp = Math.max(3, Math.min(25, Math.ceil(this.limiteEditais() / 4)));
-
+    // Passo 1: Busca atas/editais do PNCP com os mesmos filtros e profundidade de páginas da busca de editais
     this.pncpService.buscarMultiplasPaginas(
       termo,
-      paginasPncp,
-      undefined,
-      undefined,
+      this.totalPaginas(),
+      this.dataInicial() || undefined,
+      this.dataFinal() || undefined,
       this.filtroUf() || undefined
     ).subscribe({
       next: (itensPncp) => {
         const pregoes = this.pncpService.agruparPorPregao(itensPncp, true);
         const pregoesValidos = pregoes
-          .filter(p => p.atas.some(a => a.isVigente && a.permiteAdesao))
-          .slice(0, this.limiteEditais());
+          .filter(p => p.atas.some(a => a.isVigente && a.permiteAdesao));
 
         if (pregoesValidos.length === 0) {
           this.emExecucao.set(false);
           this.mensagemStatus.set('');
-          this.erro.set(`Nenhum edital federal vigente com carona encontrado para o termo "${termo}". Tente outro termo ou amplie o escopo.`);
+          this.erro.set(`Nenhum edital federal vigente com carona encontrado para o termo "${termo}" no intervalo selecionado. Tente alterar os filtros ou aumentar o número de páginas.`);
           return;
         }
 

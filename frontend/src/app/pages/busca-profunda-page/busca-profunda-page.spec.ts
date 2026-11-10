@@ -18,7 +18,9 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
 
   it('deve inicializar com valores padrao de configuracao', () => {
     expect(page.termoBusca()).toBe('');
-    expect(page.limiteEditais()).toBe(20);
+    expect(page.totalPaginas()).toBe(5);
+    expect(page.dataInicial()).toBe('');
+    expect(page.dataFinal()).toBe('');
     expect(page.emExecucao()).toBe(false);
     expect(page.todosItensEncontrados().length).toBe(0);
   });
