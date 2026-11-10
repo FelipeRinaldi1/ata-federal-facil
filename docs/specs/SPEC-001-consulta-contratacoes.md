@@ -1,7 +1,7 @@
 # Especificação Técnica e Funcional (Spec)
 
 ## 1. Visão Geral do Produto
-O **ConsultaContratações** é uma ferramenta web client-side (SPA) voltada a servidores e equipes de compras públicas para localização ágil de **Atas de Registro de Preços (ARP)** vigentes no PNCP (Portal Nacional de Contratações Públicas) para fins de **Adesão (Carona)** no âmbito da Esfera Federal.
+O **AtaFederalFacil (AFF)** é uma ferramenta web client-side (SPA) voltada a servidores e equipes de compras públicas para localização ágil de **Atas de Registro de Preços (ARP)** vigentes no PNCP (Portal Nacional de Contratações Públicas) para fins de **Adesão (Carona)** no âmbito da Esfera Federal.
 
 ---
 

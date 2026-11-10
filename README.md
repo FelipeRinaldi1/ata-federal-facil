@@ -1,4 +1,4 @@
-# AtaFácil · Consulta e Adesão a Atas de Registro de Preços
+# AtaFederalFacil (AFF) · Consulta e Adesão a Atas de Registro de Preços
 
 > **Localizador inteligente de Atas de Registro de Preços (ARP) e Itens para Adesão ("Carona") na Esfera Federal.**  
 > Uma ferramenta web client-side (SPA) desenvolvida para simplificar e acelerar as rotinas de compras públicas em Institutos Federais, Universidades e órgãos federais.
@@ -37,7 +37,7 @@ No entanto, a experiência no portal oficial do PNCP apresenta sérios gargalos:
 3. **Ausência de Filtros Críticos:** Não é possível filtrar rapidamente por órgão gerenciador ou restringir à esfera de interesse mantendo o contexto agrupado.
 4. **Desgaste Operacional com Vigência:** Dificuldade em identificar de imediato se a ata ainda tem tempo hábil de vigência para a instrução processual de carona.
 
-O **Consulta Contratações** resolve esses problemas agrupando automaticamente os dados e entregando uma interface limpa, rápida e focada em tomada de decisão.
+O **AtaFederalFacil (AFF)** resolve esses problemas agrupando automaticamente os dados e entregando uma interface limpa, rápida e focada em tomada de decisão.
 
 ---
 
