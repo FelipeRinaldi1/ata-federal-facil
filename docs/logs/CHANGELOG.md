@@ -1,5 +1,19 @@
 # Log de Decisões e Execução
 
+## [2026-11-10] Implementação da Busca Profunda de Itens e Produtos
+* **Arquitetura de Duas Páginas de Pesquisa:**
+  * **Editais (`/`):** Pesquisa rápida e consolidada de editais com atas agrupadas e verificação de itens na página visível.
+  * **Buscar Itens / Busca Profunda (`/busca-profunda`):** Página especializada em mineração profunda de itens e produtos.
+* **Mecanismos Técnicos:**
+  * Fila sequencial controlada com RxJS (`concatMap` + `delay(200)`), garantindo que as requisições aos endpoints `/itens` do PNCP não sofram bloqueio por WAF ou rate limit.
+  * Barra de progresso visual com percentual e status de cada edital analisado, com suporte a cancelamento.
+  * Tabela consolidada com paginação configurável (15, 30, 50 por página), ordenação em colunas (Nº, Descrição, Qtd, Valor Total, Órgão) e filtros em tempo real.
+  * Termos destacados de maneira sóbria em negrito sem estilos chamativos.
+  * Suporte nativo à exportação dos itens minerados para CSV.
+* **Cobertura de Testes Automatizados:**
+  * Criada suíte completa para o novo componente `BuscaProfundaPage` em `busca-profunda-page.spec.ts`.
+  * Total de testes passando: 24/24 (`npm test`).
+
 ## [2026-11-09] Inicialização do Projeto
 * **Contexto:** Necessidade de agilizar buscas de Atas de Registro de Preços no PNCP para adesão/carona na Esfera Federal, eliminando duplicidade de atas do mesmo pregão e permitindo filtros por órgão e vigência.
 * **Decisão Arquitetural:**

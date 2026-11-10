@@ -190,3 +190,25 @@ export interface PregaoAgrupado {
   carregandoItens?: boolean;
   itensCorrespondentes?: ItemCompraPncp[];
 }
+
+export interface ItemBuscaProfunda {
+  numeroItem: number;
+  descricao: string;
+  quantidade?: number;
+  unidadeMedida?: string;
+  valorUnitarioEstimado?: number;
+  valorTotal?: number;
+  valorUnitarioHomologado?: number;
+  valorTotalHomologado?: number;
+  criterioJulgamentoNome?: string;
+  situacaoCompraItemNome?: string;
+  nomeFornecedor?: string;
+  cnpj: string;
+  cnpjFormatado: string;
+  ano: number;
+  seqCompra: string;
+  nomeOrgao: string;
+  unidadeNome?: string;
+  uf?: string;
+  linkPregaoPncp: string;
+}

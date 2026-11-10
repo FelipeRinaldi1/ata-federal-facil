@@ -89,6 +89,13 @@ O **ConsultaContratações** é uma ferramenta web client-side (SPA) voltada a s
   * Links diretos para: Página da Ata no PNCP, Edital no PNCP e botões para copiar links de adesão.
 * **RF08 - Suíte de Testes Automatizados:**
   * Testes unitários e de integração de fluxo de dados executados via Vitest (`npm test`).
+* **RF13 - Busca Profunda de Itens e Produtos (Página Dedicada `/busca-profunda`):**
+  * Ferramenta de mineração em lote que consulta sequencialmente os itens de compras do PNCP para editais federais vigentes com carona.
+  * Mecanismo de fila assíncrona RxJS com controle de taxa (`delay(200)` e jitter) para total conformidade com o WAF do PNCP.
+  * Barra de progresso percentual e feedback de status em tempo real com opção de pausar/cancelar.
+  * Tabela rica consolidada contendo: Número do Item, Descrição com destaque em negrito, Quantidade/Unidade, Valor Unitário e Total homologado/estimado, Órgão Licitante, UF e Link direto para o Edital.
+  * Filtros locais na tabela por Órgão e refinamento textual de descrição, ordenação em múltiplas colunas e paginação (15, 30, 50 por página).
+  * Exportação tabular direta para planilha em formato CSV.
 
 ---
 
