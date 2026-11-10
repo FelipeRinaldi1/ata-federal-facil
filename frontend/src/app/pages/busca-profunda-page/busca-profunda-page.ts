@@ -32,7 +32,8 @@ export class BuscaProfundaPage {
   ];
 
   // Parâmetros de Busca
-  termoBusca = signal<string>('');
+  termoObjeto = signal<string>(''); // Termo pesquisado no Objeto/Cabeçalho no PNCP
+  termoItem = signal<string>('');   // Termo refinado para encontrar nos Itens específicos da compra
   filtroUf = signal<string>('');
   dataInicial = signal<string>('');
   dataFinal = signal<string>('');
@@ -132,9 +133,11 @@ export class BuscaProfundaPage {
   });
 
   iniciarVarredura() {
-    const termo = this.termoBusca().trim();
-    if (!termo) {
-      this.erro.set('Digite um termo de pesquisa para localizar os itens nos editais.');
+    const objeto = this.termoObjeto().trim();
+    const item = this.termoItem().trim();
+
+    if (!objeto && !item) {
+      this.erro.set('Preencha ao menos o Objeto ou o Item desejado para realizar a pesquisa.');
       return;
     }
 
@@ -150,9 +153,12 @@ export class BuscaProfundaPage {
     this.paginaAtual.set(1);
     this.mensagemStatus.set('Consultando atas e editais federais vigentes...');
 
+    // Termo enviado na requisição geral do PNCP (usa Objeto se preenchido, senão o termo do Item)
+    const termoPncp = objeto || item;
+
     // Passo 1: Busca atas/editais do PNCP com os mesmos filtros e profundidade de páginas da busca de editais
     this.pncpService.buscarMultiplasPaginas(
-      termo,
+      termoPncp,
       this.totalPaginas(),
       this.dataInicial() || undefined,
       this.dataFinal() || undefined,
@@ -166,11 +172,11 @@ export class BuscaProfundaPage {
         if (pregoesValidos.length === 0) {
           this.emExecucao.set(false);
           this.mensagemStatus.set('');
-          this.erro.set(`Nenhum edital federal vigente com carona encontrado para o termo "${termo}" no intervalo selecionado. Tente alterar os filtros ou aumentar o número de páginas.`);
+          this.erro.set(`Nenhum edital federal vigente com carona encontrado para o critério informado. Tente alterar os filtros ou aumentar o número de páginas.`);
           return;
         }
 
-        this.executarVarreduraItens(pregoesValidos, termo);
+        this.executarVarreduraItens(pregoesValidos, item);
       },
       error: (err) => {
         console.error('Erro na etapa 1 da busca profunda:', err);
@@ -214,7 +220,8 @@ export class BuscaProfundaPage {
 
         for (const it of itens) {
           const descNorm = this.normalizar(it.descricao);
-          if (descNorm.includes(termoNorm)) {
+          // Se termo do item foi definido, filtra por ele; se estiver vazio, inclui todos os itens do edital
+          if (!termoNorm || descNorm.includes(termoNorm)) {
             itensAcumulados.push({
               numeroItem: it.numeroItem,
               descricao: it.descricao,
@@ -328,7 +335,8 @@ export class BuscaProfundaPage {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `itens_busca_profunda_${this.termoBusca() || 'pncp'}.csv`);
+    const termo = this.termoItem() || this.termoObjeto() || 'pncp';
+    link.setAttribute('download', `itens_busca_profunda_${termo}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

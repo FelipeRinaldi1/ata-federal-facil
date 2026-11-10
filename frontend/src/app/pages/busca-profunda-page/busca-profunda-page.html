@@ -37,38 +37,54 @@
     </div>
   </div>
 
-  <!-- Painel de Configuração da Varredura (Mesmos filtros da Busca de Editais) -->
+  <!-- Painel de Configuração da Varredura (Mesmos filtros da Busca de Editais + Campo de Objeto e Item) -->
   <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 shadow-xs">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
       
-      <!-- Termo do Item -->
-      <div class="sm:col-span-2 lg:col-span-4">
-        <label for="campo-termo-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-          Nome ou Descrição do Item <span class="text-red-500">*</span>
+      <!-- Objeto do Edital -->
+      <div class="sm:col-span-1 lg:col-span-3">
+        <label for="campo-objeto-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Objeto do Edital
         </label>
         <input 
-          id="campo-termo-profundo"
+          id="campo-objeto-profundo"
           type="text" 
-          [ngModel]="termoBusca()"
-          (ngModelChange)="termoBusca.set($event)"
+          [ngModel]="termoObjeto()"
+          (ngModelChange)="termoObjeto.set($event)"
           (keyup.enter)="iniciarVarredura()"
-          placeholder="Ex: cadeira giratória, projetor laser, microcomputador..."
+          placeholder="Ex: mobiliário, informática..."
+          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
+        />
+      </div>
+
+      <!-- Item Específico -->
+      <div class="sm:col-span-1 lg:col-span-3">
+        <label for="campo-item-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Item Específico
+        </label>
+        <input 
+          id="campo-item-profundo"
+          type="text" 
+          [ngModel]="termoItem()"
+          (ngModelChange)="termoItem.set($event)"
+          (keyup.enter)="iniciarVarredura()"
+          placeholder="Ex: cadeira giratória, projetor..."
           class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
         />
       </div>
 
       <!-- UF do Órgão -->
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-1">
         <label for="campo-uf-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-          UF do Órgão
+          UF
         </label>
         <select 
           id="campo-uf-profundo"
           [ngModel]="filtroUf()"
           (ngModelChange)="filtroUf.set($event)"
-          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
         >
-          <option value="">Todas as UFs</option>
+          <option value="">Todas</option>
           @for (uf of todasUfs; track uf) {
             <option [value]="uf">{{ uf }}</option>
           }
@@ -78,47 +94,47 @@
       <!-- Data Inicial -->
       <div class="lg:col-span-2">
         <label for="campo-data-inicial-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-          Publicado a partir de
+          A partir de
         </label>
         <input 
           id="campo-data-inicial-profundo"
           type="date" 
           [ngModel]="dataInicial()"
           (ngModelChange)="dataInicial.set($event)"
-          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
         />
       </div>
 
       <!-- Data Final -->
       <div class="lg:col-span-2">
         <label for="campo-data-final-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-          Publicado até
+          Até
         </label>
         <input 
           id="campo-data-final-profundo"
           type="date" 
           [ngModel]="dataFinal()"
           (ngModelChange)="dataFinal.set($event)"
-          class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
         />
       </div>
 
       <!-- Profundidade da Busca (Páginas de Atas no PNCP) -->
       <div class="lg:col-span-1">
         <label for="campo-escopo-editais" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 atas no PNCP">
-          Páginas
+          Págs
         </label>
         <select 
           id="campo-escopo-editais"
           [ngModel]="totalPaginas()"
           (ngModelChange)="totalPaginas.set($event)"
-          class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          class="w-full px-1.5 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
         >
-          <option [ngValue]="5">5 (~100)</option>
-          <option [ngValue]="10">10 (~200)</option>
-          <option [ngValue]="15">15 (~300)</option>
-          <option [ngValue]="25">25 (~500)</option>
-          <option [ngValue]="50">50 (~1k)</option>
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="15">15</option>
+          <option [ngValue]="25">25</option>
+          <option [ngValue]="50">50</option>
         </select>
       </div>
 
@@ -293,7 +309,7 @@
                 #{{ item.numeroItem }}
               </td>
               <td class="py-2.5 px-3 leading-relaxed text-neutral-800 dark:text-neutral-200">
-                <div [innerHTML]="destacarTermo(item.descricao, termoBusca())"></div>
+                <div [innerHTML]="destacarTermo(item.descricao, termoItem() || termoObjeto())"></div>
                 @if (item.situacaoCompraItemNome) {
                   <span class="inline-block mt-0.5 text-[10px] text-neutral-500 font-mono">
                     Situação: {{ item.situacaoCompraItemNome }}

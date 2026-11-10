@@ -17,7 +17,8 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
   });
 
   it('deve inicializar com valores padrao de configuracao', () => {
-    expect(page.termoBusca()).toBe('');
+    expect(page.termoObjeto()).toBe('');
+    expect(page.termoItem()).toBe('');
     expect(page.totalPaginas()).toBe(5);
     expect(page.dataInicial()).toBe('');
     expect(page.dataFinal()).toBe('');
@@ -25,10 +26,11 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
     expect(page.todosItensEncontrados().length).toBe(0);
   });
 
-  it('deve exibir mensagem de erro se tentar iniciar sem termo', () => {
-    page.termoBusca.set('   ');
+  it('deve exibir mensagem de erro se tentar iniciar sem termo no objeto e sem item', () => {
+    page.termoObjeto.set('   ');
+    page.termoItem.set('');
     page.iniciarVarredura();
-    expect(page.erro()).toContain('Digite um termo de pesquisa');
+    expect(page.erro()).toContain('Preencha ao menos o Objeto ou o Item');
     expect(page.emExecucao()).toBe(false);
   });
 
