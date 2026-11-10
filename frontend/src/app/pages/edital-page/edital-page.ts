@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PncpService } from '../../services/pncp.service';
 import { StatusAnaliseService } from '../../services/status-analise.service';
-import { PregaoAgrupado, DetalheCompraPncp, ItemCompraPncp } from '../../models/pncp.models';
+import { PregaoAgrupado, DetalheCompraPncp, ItemCompraPncp, ArquivoPublicacaoPncp } from '../../models/pncp.models';
 
 @Component({
   selector: 'app-edital-page',
@@ -28,6 +28,11 @@ export class EditalPage implements OnInit {
 
   pregao = signal<PregaoAgrupado | null>(null);
   detalheCompra = signal<DetalheCompraPncp | null>(null);
+
+  // Documentos Oficiais do Edital (Edital, Termo de Referência, etc.)
+  arquivosEdital = signal<ArquivoPublicacaoPncp[]>([]);
+  carregandoArquivos = signal<boolean>(false);
+  secaoArquivosRecolhida = signal<boolean>(false);
 
   // Fase 2: Itens / Produtos do Edital
   itensCompra = signal<ItemCompraPncp[]>([]);
@@ -177,6 +182,9 @@ export class EditalPage implements OnInit {
 
         // Fase 2: Carrega os itens automaticamente
         this.carregarItensEdital(cnpj, ano, seqCompra);
+
+        // Documentos Oficiais da Compra (Edital, Termo de Referência, etc.)
+        this.carregarArquivosEdital(cnpj, ano, seqCompra);
       },
       error: (err) => {
         console.error('Erro ao consultar detalhes da compra:', err);
@@ -188,6 +196,7 @@ export class EditalPage implements OnInit {
           this.carregarAtasEdital(cnpj, ano, seqCompra);
         }
         this.carregarItensEdital(cnpj, ano, seqCompra);
+        this.carregarArquivosEdital(cnpj, ano, seqCompra);
       }
     });
   }
@@ -208,6 +217,20 @@ export class EditalPage implements OnInit {
             });
           }
         }
+      }
+    });
+  }
+
+  carregarArquivosEdital(cnpj: string, ano: string, seqCompra: string) {
+    this.carregandoArquivos.set(true);
+    this.pncpService.consultarArquivosCompra(cnpj, ano, seqCompra).subscribe({
+      next: (arquivos) => {
+        this.arquivosEdital.set(arquivos);
+        this.carregandoArquivos.set(false);
+      },
+      error: (err) => {
+        console.warn('Falha ao carregar arquivos do edital:', err);
+        this.carregandoArquivos.set(false);
       }
     });
   }

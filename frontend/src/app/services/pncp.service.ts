@@ -142,6 +142,17 @@ export class PncpService {
       })
     );
   }
+  consultarArquivosCompra(cnpj: string, ano: number | string, seqCompra: string | number): Observable<ArquivoPublicacaoPncp[]> {
+    const url = `${this.BASE_PNCP_URL}orgaos/${cnpj}/compras/${ano}/${seqCompra}/arquivos`;
+    return this.http.get<ArquivoPublicacaoPncp[]>(url).pipe(
+      map(res => Array.isArray(res) ? res : []),
+      catchError(err => {
+        console.warn(`Não foi possível carregar os arquivos da compra ${cnpj}/${ano}/${seqCompra}:`, err);
+        return of([]);
+      })
+    );
+  }
+
   consultarArquivosAta(cnpj: string, ano: number | string, seqCompra: string | number, seqAta: string | number): Observable<ArquivoPublicacaoPncp[]> {
     const url = `${this.BASE_PNCP_URL}orgaos/${cnpj}/compras/${ano}/${seqCompra}/atas/${seqAta}/arquivos`;
     return this.http.get<ArquivoPublicacaoPncp[]>(url).pipe(

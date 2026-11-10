@@ -196,6 +196,78 @@
           </a>
         </div>
       }
+
+      <!-- Seção de Documentos Oficiais do Edital (Download Direto) -->
+      <div class="p-5 border-t border-neutral-200 dark:border-neutral-800">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+              <span>📄</span>
+              <span>Documentos e Arquivos do Edital</span>
+              @if (arquivosEdital().length > 0) {
+                <span class="px-2 py-0.2 rounded-full text-[10px] bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-normal">
+                  {{ arquivosEdital().length }}
+                </span>
+              }
+            </h2>
+            <p class="text-[11px] text-neutral-500 dark:text-neutral-400">
+              Download direto do Edital, Termo de Referência (TR), Anexos e documentos oficiais disponibilizados pelo órgão no PNCP.
+            </p>
+          </div>
+
+          <button 
+            type="button"
+            (click)="secaoArquivosRecolhida.set(!secaoArquivosRecolhida())"
+            class="text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
+          >
+            <span>{{ secaoArquivosRecolhida() ? '▶ Expandir' : '▼ Recolher' }}</span>
+          </button>
+        </div>
+
+        @if (!secaoArquivosRecolhida()) {
+          @if (carregandoArquivos()) {
+            <div class="py-4 text-center text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-center gap-2">
+              <div class="w-4 h-4 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin"></div>
+              <span>Carregando arquivos oficiais do edital...</span>
+            </div>
+          } @else if (arquivosEdital().length > 0) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+              @for (doc of arquivosEdital(); track doc.url) {
+                <a 
+                  [href]="doc.url" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-between p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition group text-xs"
+                >
+                  <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                    <span class="text-red-500 dark:text-red-400 text-base">📄</span>
+                    <div class="min-w-0">
+                      <span class="font-medium text-neutral-900 dark:text-white block truncate group-hover:underline">
+                        {{ doc.titulo || doc.tipoDocumentoNome || 'Documento do Edital' }}
+                      </span>
+                      <span class="text-[10px] text-neutral-500 block truncate">
+                        {{ doc.tipoDocumentoNome || 'Edital / Anexo' }}
+                        @if (doc.dataPublicacaoPncp) {
+                          · {{ doc.dataPublicacaoPncp | date:'dd/MM/yyyy' }}
+                        }
+                      </span>
+                    </div>
+                  </div>
+
+                  <span class="px-2 py-1 text-[10px] font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded shrink-0 group-hover:bg-[#22863a] group-hover:text-white group-hover:border-[#22863a] transition">
+                    Baixar ↗
+                  </span>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="p-4 rounded border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 text-center mt-3 bg-neutral-50 dark:bg-neutral-800/30">
+              Nenhum documento avulso retornado via API. Você pode acessar diretamente pelo portal através do botão 
+              <a [href]="pregao()?.linkPregaoPncp" target="_blank" class="text-[#22863a] font-medium underline">Abrir no PNCP</a>.
+            </div>
+          }
+        }
+      </div>
     </article>
 
     <!-- Seção Fase 2: Itens e Produtos da Licitação -->

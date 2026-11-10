@@ -102,7 +102,19 @@
 ## [2026-11-09] Registro de Backlog de Evolução (Fase 2 e 3)
 * **Registrados na Especificação (`SPEC-001`):**
   - **Fase 2 (Detalhamento de Itens/Produtos):** Validação técnica concluída do endpoint `/compras/{ano}/{seqCompra}/itens` para renderização sob demanda da tabela de produtos com número de item, descrição, quantidade e valores homologados.
-  - **Fase 3 (Instrução Processual de Carona):** Exportação dos editais selecionados para planilha de ETP, links diretos de arquivos `/arquivos` (Edital/TR) e campo de anotações internas persistidas.
+  - **Fase 3 (Instrução Processual de Carona):** Exportação dos editais selecionados para planilha de ETP e links diretos de arquivos `/arquivos` (Edital/TR).
+
+## [2026-11-10] Implementação: Download Direto de Documentos do Edital e Atas (RF11)
+* **Novo método em `PncpService`:**
+  * Adicionado `consultarArquivosCompra(cnpj, ano, seqCompra)` para consumir `/api/pncp/v1/orgaos/{cnpj}/compras/{ano}/{seqCompra}/arquivos`.
+* **Interface da Página do Edital (`EditalPage`):**
+  * Criada seção dedicada para listagem e download com 1 clique de todos os arquivos publicados do edital (Edital, Termo de Referência, Anexos técnicos e minutas contratuais).
+  * Exibição de metadados: tipo de documento, data de publicação e botão direto de download (`Baixar ↗`).
+* **Página da Ata (`AtaPage`):**
+  * Mantida e integrada a listagem de arquivos digitalizados específicos de cada Ata de Registro de Preços via `/atas/{seqAta}/arquivos`.
+* **Qualidade e Estabilidade:**
+  * 17/17 testes unitários passando com sucesso (`npm test`).
+  * Build de produção gerado com sucesso.
 
 
 

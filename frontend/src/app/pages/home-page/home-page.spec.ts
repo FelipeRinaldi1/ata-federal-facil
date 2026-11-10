@@ -21,8 +21,8 @@ describe('HomePage Component (Testes Unitários & Reatividade de Sinais)', () =>
     homePage = new HomePage(fakeService, statusService);
   });
 
-  it('deve inicializar com busca padrao e apenas atas vigentes e com adesao permitida', () => {
-    expect(homePage.termoBusca()).toBe('mobiliário');
+  it('deve inicializar com busca padrao vazia e filtros zerados', () => {
+    expect(homePage.termoBusca()).toBe('');
     expect(homePage.filtroOrgao()).toBe('');
     expect(homePage.filtroStatusAnalise()).toBe('todos');
   });

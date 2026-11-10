@@ -122,6 +122,4 @@ O **ConsultaContratações** é uma ferramenta web client-side (SPA) voltada a s
   * Botão de exportação para planilha (.xlsx / .csv) das atas selecionadas/vistas com campos essenciais de vantajosidade e justificativa de preço.
 * **RF11 - Links e Download Direto de Documentos:**
   * Consumo do endpoint `/arquivos` para disponibilizar links diretos para o download do Edital e Termo de Referência (TR).
-* **RF12 - Anotações e Histórico de Contato:**
-  * Campo de notas persistido no `localStorage` para registro de contatos com o órgão gerenciador (ex: data de envio de ofício de adesão).
 
