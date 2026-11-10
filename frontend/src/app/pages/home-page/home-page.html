@@ -262,10 +262,10 @@
           [class.dark:bg-neutral-900]="pregao.statusAnalise !== 'analisado'"
           [class.border-neutral-200]="pregao.statusAnalise !== 'analisado'"
           [class.dark:border-neutral-800]="pregao.statusAnalise !== 'analisado'"
-          [class.bg-slate-50]="pregao.statusAnalise === 'analisado'"
-          [class.dark:bg-neutral-900/60]="pregao.statusAnalise === 'analisado'"
-          [class.border-slate-300]="pregao.statusAnalise === 'analisado'"
-          [class.dark:border-neutral-700]="pregao.statusAnalise === 'analisado'"
+          [class.bg-emerald-50/40]="pregao.statusAnalise === 'analisado'"
+          [class.dark:bg-emerald-950/20]="pregao.statusAnalise === 'analisado'"
+          [class.border-emerald-200]="pregao.statusAnalise === 'analisado'"
+          [class.dark:border-emerald-900/40]="pregao.statusAnalise === 'analisado'"
         >
           <!-- Cabeçalho do Card (Edital Pai) -->
           <div class="p-4">
@@ -287,10 +287,10 @@
                   [class.dark:bg-amber-900/40]="pregao.statusAnalise === 'em-analise'"
                   [class.text-amber-800]="pregao.statusAnalise === 'em-analise'"
                   [class.dark:text-amber-300]="pregao.statusAnalise === 'em-analise'"
-                  [class.border-slate-700]="pregao.statusAnalise === 'analisado'"
-                  [class.dark:border-neutral-500]="pregao.statusAnalise === 'analisado'"
-                  [class.bg-slate-800]="pregao.statusAnalise === 'analisado'"
-                  [class.dark:bg-neutral-700]="pregao.statusAnalise === 'analisado'"
+                  [class.border-emerald-700]="pregao.statusAnalise === 'analisado'"
+                  [class.dark:border-emerald-500]="pregao.statusAnalise === 'analisado'"
+                  [class.bg-[#22863a]]="pregao.statusAnalise === 'analisado'"
+                  [class.dark:bg-emerald-700]="pregao.statusAnalise === 'analisado'"
                   [class.text-white]="pregao.statusAnalise === 'analisado'"
                 >
                   @if (pregao.statusAnalise === 'analisado') {
@@ -315,7 +315,7 @@
                     <span class="text-neutral-500 dark:text-neutral-500 font-mono">CNPJ: {{ pregao.cnpjFormatado }}</span>
                     
                     @if (pregao.statusAnalise === 'analisado') {
-                      <span class="px-1.5 py-0.2 bg-slate-200 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 text-[10px] rounded font-medium">Visto</span>
+                      <span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-900/50 text-[#1e7533] dark:text-emerald-300 text-[10px] rounded font-medium border border-emerald-200 dark:border-emerald-800">Concluído</span>
                     } @else if (pregao.statusAnalise === 'em-analise') {
                       <span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-[10px] rounded font-medium">Incompleto</span>
                     }
@@ -421,10 +421,10 @@
                   [class.dark:bg-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
                   [class.border-neutral-200]="!statusAnaliseService.isAtaAnalisada(ata.id)"
                   [class.dark:border-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-                  [class.bg-slate-50]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                  [class.dark:bg-neutral-900/40]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                  [class.border-slate-300]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                  [class.dark:border-neutral-800]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.bg-emerald-50/60]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.dark:bg-emerald-950/30]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.border-emerald-200]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.dark:border-emerald-900/50]="statusAnaliseService.isAtaAnalisada(ata.id)"
                 >
                   <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                     
@@ -439,10 +439,10 @@
                         [class.dark:border-neutral-700]="!statusAnaliseService.isAtaAnalisada(ata.id)"
                         [class.bg-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
                         [class.dark:bg-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-                        [class.border-slate-700]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                        [class.dark:border-neutral-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                        [class.bg-slate-800]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                        [class.dark:bg-neutral-700]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.border-emerald-700]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:border-emerald-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.bg-[#22863a]]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:bg-emerald-700]="statusAnaliseService.isAtaAnalisada(ata.id)"
                         [class.text-white]="statusAnaliseService.isAtaAnalisada(ata.id)"
                       >
                         @if (statusAnaliseService.isAtaAnalisada(ata.id)) {
