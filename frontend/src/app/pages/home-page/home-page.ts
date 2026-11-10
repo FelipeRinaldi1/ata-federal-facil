@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PncpService } from '../../services/pncp.service';
 import { StatusAnaliseService } from '../../services/status-analise.service';
-import { PregaoAgrupado, AtaVinculada, CriterioOrdenacao } from '../../models/pncp.models';
+import { PregaoAgrupado, AtaVinculada, CriterioOrdenacao, ItemCompraPncp } from '../../models/pncp.models';
 
 @Component({
   selector: 'app-home-page',
@@ -21,8 +21,17 @@ export class HomePage {
     pncpService?: PncpService, 
     statusAnaliseService?: StatusAnaliseService
   ) {
-    this.pncpService = pncpService ?? inject(PncpService);
-    this.statusAnaliseService = statusAnaliseService ?? inject(StatusAnaliseService);
+    if (pncpService) {
+      this.pncpService = pncpService;
+    } else {
+      this.pncpService = inject(PncpService);
+    }
+
+    if (statusAnaliseService) {
+      this.statusAnaliseService = statusAnaliseService;
+    } else {
+      this.statusAnaliseService = inject(StatusAnaliseService);
+    }
   }
 
   // Lista Completa de UFs Brasileiras
@@ -76,10 +85,21 @@ export class HomePage {
         const atasIds = atasFiltradas.map(a => a.id);
         const statusAnalise = this.statusAnaliseService.getPregaoStatus(atasIds);
 
+        // Se houver itens carregados e termo de busca, filtra os itens correspondentes
+        const termo = this.termoBusca().trim();
+        let itensCorrespondentes: ItemCompraPncp[] | undefined = undefined;
+        if (termo && p.itensCarregados) {
+          const termoNorm = this.normalizar(termo);
+          itensCorrespondentes = p.itensCarregados.filter(item => 
+            this.normalizar(item.descricao).includes(termoNorm)
+          );
+        }
+
         return {
           ...p,
           atasFiltradas,
-          statusAnalise
+          statusAnalise,
+          itensCorrespondentes
         };
       })
       .filter(p => {
@@ -117,7 +137,17 @@ export class HomePage {
     const pag = this.paginaAtual();
     const porPag = this.itensPorPagina();
     const inicio = (pag - 1) * porPag;
-    return lista.slice(inicio, inicio + porPag);
+    const paginados = lista.slice(inicio, inicio + porPag);
+
+    // Se houver termo de busca, aciona a busca dos itens para os pregões da página visível
+    const termo = this.termoBusca().trim();
+    if (termo && paginados.length > 0) {
+      queueMicrotask(() => {
+        this.carregarItensParaPregoesPaginados(paginados, termo);
+      });
+    }
+
+    return paginados;
   });
 
   // Estatísticas Rápidas
@@ -218,6 +248,74 @@ export class HomePage {
       this.feedbackCopiado.set(`${label} copiado!`);
       setTimeout(() => this.feedbackCopiado.set(null), 2500);
     });
+  }
+
+  carregarItensParaPregoesPaginados(pregoes: PregaoAgrupado[], termo: string) {
+    for (const pregao of pregoes) {
+      if (pregao.itensCarregados !== undefined || pregao.carregandoItens) {
+        continue;
+      }
+
+      // Marca como carregando localmente no array do sinal
+      this.atualizarPregaoStatusItens(pregao.chavePregao, true, undefined);
+
+      this.pncpService.consultarItensCompra(pregao.cnpj, pregao.ano, pregao.seqCompra).subscribe({
+        next: (itens) => {
+          this.atualizarPregaoStatusItens(pregao.chavePregao, false, itens);
+        },
+        error: () => {
+          this.atualizarPregaoStatusItens(pregao.chavePregao, false, []);
+        }
+      });
+    }
+  }
+
+  private atualizarPregaoStatusItens(chavePregao: string, carregando: boolean, itens?: ItemCompraPncp[]) {
+    this.todosPregoes.update(lista =>
+      lista.map(p => {
+        if (p.chavePregao !== chavePregao) return p;
+        return {
+          ...p,
+          carregandoItens: carregando,
+          itensCarregados: itens !== undefined ? itens : p.itensCarregados
+        };
+      })
+    );
+  }
+
+  /**
+   * Destaca o termo encontrado no texto colocando-o em negrito (<strong>) de forma sóbria e segura.
+   * Não usa fundos coloridos nem animações, preservando legibilidade institucional.
+   */
+  destacarTermo(texto: string, termo: string): string {
+    if (!texto) return '';
+    if (!termo || !termo.trim()) return this.escaparHtml(texto);
+
+    const termoTrim = termo.trim();
+    // Escapar caracteres especiais de regex
+    const regexEspecial = termoTrim.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Suportar acentuação insensível básica substituindo vogais por grupos com acentos
+    const padraoFlexivel = regexEspecial
+      .replace(/a/gi, '[aáàãâä]')
+      .replace(/e/gi, '[eéèêë]')
+      .replace(/i/gi, '[iíìîï]')
+      .replace(/o/gi, '[oóòõôö]')
+      .replace(/u/gi, '[uúùûü]')
+      .replace(/c/gi, '[cç]');
+
+    const regex = new RegExp(`(${padraoFlexivel})`, 'gi');
+    const textoSeguro = this.escaparHtml(texto);
+    return textoSeguro.replace(regex, '<strong class="font-bold text-neutral-900 dark:text-neutral-100">$1</strong>');
+  }
+
+  private escaparHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   limparFiltros() {

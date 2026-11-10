@@ -231,4 +231,20 @@ describe('HomePage Component (Testes Unitários & Reatividade de Sinais)', () =>
     expect(resultado.length).toBe(1);
     expect(resultado[0].chavePregao).toBe('valido');
   });
+
+  it('deve destacar termos no texto em negrito sem adicionar estilos chamativos', () => {
+    const texto = 'Contratação de empresa para fornecimento de cadeiras estofadas';
+    const termo = 'cadeiras';
+    const resultado = homePage.destacarTermo(texto, termo);
+    expect(resultado).toContain('<strong class="font-bold text-neutral-900 dark:text-neutral-100">cadeiras</strong>');
+  });
+
+  it('deve escapar tags html maliciosas no destacarTermo', () => {
+    const perigoso = '<script>alert("xss")</script> e mesa';
+    const termo = 'mesa';
+    const resultado = homePage.destacarTermo(perigoso, termo);
+    expect(resultado).not.toContain('<script>');
+    expect(resultado).toContain('&lt;script&gt;');
+    expect(resultado).toContain('<strong class="font-bold text-neutral-900 dark:text-neutral-100">mesa</strong>');
+  });
 });

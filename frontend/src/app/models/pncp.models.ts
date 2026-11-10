@@ -186,4 +186,7 @@ export interface PregaoAgrupado {
   atasFiltradas?: AtaVinculada[];
   statusAnalise?: 'pendente' | 'em-analise' | 'analisado';
   expandido?: boolean;
+  itensCarregados?: ItemCompraPncp[];
+  carregandoItens?: boolean;
+  itensCorrespondentes?: ItemCompraPncp[];
 }

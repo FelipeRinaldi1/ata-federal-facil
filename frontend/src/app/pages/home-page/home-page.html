@@ -381,9 +381,32 @@
               <span class="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-0.5">
                 Objeto
               </span>
-              <p class="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                {{ pregao.objetoResumido }}
+              <p class="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed" [innerHTML]="destacarTermo(pregao.objetoResumido, termoBusca())">
               </p>
+
+              <!-- Itens do Edital encontrados na busca por termo (Abordagem A) -->
+              @if (termoBusca().trim()) {
+                @if (pregao.carregandoItens) {
+                  <div class="mt-2 text-[11px] text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin"></span>
+                    <span>Verificando itens do edital...</span>
+                  </div>
+                } @else if (pregao.itensCorrespondentes && pregao.itensCorrespondentes.length > 0) {
+                  <div class="mt-2.5 pt-2 border-t border-dashed border-neutral-200 dark:border-neutral-800">
+                    <div class="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 flex items-center gap-1.5">
+                      <span>Itens correspondentes ao termo no edital ({{ pregao.itensCorrespondentes.length }}):</span>
+                    </div>
+                    <ul class="space-y-1.5">
+                      @for (item of pregao.itensCorrespondentes; track item.numeroItem) {
+                        <li class="text-xs text-neutral-700 dark:text-neutral-300 pl-2 border-l-2 border-neutral-300 dark:border-neutral-700 leading-relaxed">
+                          <span class="font-medium text-neutral-800 dark:text-neutral-200">Item {{ item.numeroItem }}:</span>
+                          <span class="ml-1" [innerHTML]="destacarTermo(item.descricao, termoBusca())"></span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              }
             </div>
           </div>
 
