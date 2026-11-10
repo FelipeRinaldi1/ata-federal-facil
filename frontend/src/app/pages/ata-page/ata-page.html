@@ -157,7 +157,7 @@
     </div>
 
     <!-- Grade de Detalhes da Vigência e Processamento -->
-    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs border-b border-neutral-200 dark:border-neutral-800">
+    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs border-b border-neutral-200 dark:border-neutral-800">
       <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
         <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Início da Vigência</span>
         <span class="font-medium text-neutral-900 dark:text-white">
@@ -181,8 +181,8 @@
 
       <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
         <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Permite Adesão ("Carona")</span>
-        <span class="font-semibold text-[#1e7533] dark:text-emerald-400">
-          {{ ata()?.permiteAdesao ? 'Sim (Permitida nos termos da 14.133/2021)' : 'Não informada' }}
+        <span class="font-medium text-neutral-600 dark:text-neutral-400">
+          {{ ata()?.permiteAdesao ? 'Sim' : 'Não' }}
         </span>
       </div>
 
@@ -197,20 +197,6 @@
         <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Sequencial da Compra</span>
         <span class="font-mono font-medium text-neutral-900 dark:text-white">
           {{ seqCompra() }}
-        </span>
-      </div>
-
-      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Número da Ata</span>
-        <span class="font-mono font-medium text-neutral-900 dark:text-white">
-          {{ ata()?.numeroAta || seqAta() }}
-        </span>
-      </div>
-
-      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Dias Restantes de Vigência</span>
-        <span class="font-bold text-neutral-900 dark:text-white">
-          {{ ata()?.diasRestantes !== undefined ? (ata()?.diasRestantes + ' dias') : '-' }}
         </span>
       </div>
     </div>

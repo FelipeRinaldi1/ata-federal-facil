@@ -634,11 +634,8 @@
                   }
 
                   <div class="text-neutral-500 dark:text-neutral-400 flex flex-wrap gap-x-4 text-[11px] pt-1">
-                    @if (ata.vigenciaInicio) {
-                      <span>Vigência Início: {{ ata.vigenciaInicio | date:'dd/MM/yyyy' }}</span>
-                    }
                     @if (ata.vigenciaFim) {
-                      <span>Vigência Fim: {{ ata.vigenciaFim | date:'dd/MM/yyyy' }}</span>
+                      <span>Vence em: {{ ata.vigenciaFim | date:'dd/MM/yyyy' }}</span>
                     }
                     @if (ata.valorTotal) {
                       <span>Valor Global: <strong>{{ ata.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
