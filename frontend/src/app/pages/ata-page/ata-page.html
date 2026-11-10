@@ -1,0 +1,309 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- Feedback Flutuante de Cópia -->
+  @if (feedbackCopiado()) {
+    <div class="fixed bottom-5 right-5 z-50 bg-neutral-900 text-white text-xs px-3 py-2 rounded shadow-lg border border-neutral-700 animate-fade-in flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+      <span>{{ feedbackCopiado() }}</span>
+    </div>
+  }
+
+  <!-- Navegação de Retorno -->
+  <nav class="mb-5 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+    <a routerLink="/" class="hover:text-neutral-900 dark:hover:text-neutral-100 flex items-center gap-1 transition">
+      <span>←</span>
+      <span>Início</span>
+    </a>
+    <span>/</span>
+    <a [routerLink]="['/edital', cnpj(), ano(), seqCompra()]" class="hover:text-neutral-900 dark:hover:text-neutral-100 transition">
+      Edital nº {{ seqCompra() }}/{{ ano() }}
+    </a>
+    <span>/</span>
+    <span class="text-neutral-800 dark:text-neutral-200 font-medium">
+      Ata nº {{ ata()?.numeroAta || seqAta() }}
+    </span>
+  </nav>
+
+  <!-- Card Principal da Ata -->
+  <article class="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-xs shadow-xs overflow-hidden">
+    
+    <!-- Cabeçalho Institucional -->
+    <div class="p-6 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950/40">
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+        
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded tracking-wide bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300">
+              Ata de Registro de Preços
+            </span>
+
+            @if (ata()) {
+              @if (ata()!.statusVigencia === 'vigente') {
+                <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-[#e6ffed] dark:bg-emerald-950/50 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                  Vigente ({{ ata()!.diasRestantes }} dias restantes)
+                </span>
+              } @else if (ata()!.statusVigencia === 'prestes-a-vencer') {
+                <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+                  Vence em breve ({{ ata()!.diasRestantes }} dias)
+                </span>
+              } @else if (ata()!.statusVigencia === 'expirada') {
+                <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-300 dark:border-neutral-700">
+                  Expirada
+                </span>
+              }
+            }
+          </div>
+
+          <h1 class="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white leading-tight">
+            Ata de Registro de Preços nº {{ ata()?.numeroAta || seqAta() }}/{{ ata()?.ano || ano() }}
+          </h1>
+
+          <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+            {{ pregao()?.nomeOrgao || detalheCompra()?.orgaoEntidade?.razaoSocial || 'Órgão da Administração Pública' }}
+            @if (pregao()?.unidadeNome) {
+              <span>· {{ pregao()?.unidadeNome }}</span>
+            }
+            @if (pregao()?.uf) {
+              <span>· {{ pregao()?.uf }}</span>
+            }
+          </p>
+        </div>
+
+        <!-- Ações do Topo -->
+        <div class="flex flex-wrap items-center gap-2">
+          @if (ata()) {
+            <button
+              type="button"
+              (click)="statusAnaliseService.toggleAta(ata()!.id)"
+              class="px-3 py-1.5 text-xs font-semibold rounded border transition cursor-pointer flex items-center gap-1.5"
+              [class.bg-[#22863a]]="statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.text-white]="statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.border-[#22863a]]="statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.bg-white]="!statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.dark:bg-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.text-neutral-700]="!statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.dark:text-neutral-200]="!statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.border-neutral-300]="!statusAnaliseService.isAtaAnalisada(ata()!.id)"
+              [class.dark:border-neutral-700]="!statusAnaliseService.isAtaAnalisada(ata()!.id)"
+            >
+              @if (statusAnaliseService.isAtaAnalisada(ata()!.id)) {
+                <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Ata Analisada</span>
+              } @else {
+                <span class="w-3.5 h-3.5 border border-neutral-400 rounded-xs"></span>
+                <span>Marcar como Analisada</span>
+              }
+            </button>
+
+            <a 
+              [href]="ata()!.urlAtaPncp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="px-3 py-1.5 text-xs text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded transition font-medium"
+            >
+              Abrir no PNCP ↗
+            </a>
+
+            <button 
+              type="button"
+              (click)="copiarTexto(ata()!.urlAtaPncp, 'Link da Ata')"
+              class="px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-300 dark:border-neutral-700 rounded hover:bg-neutral-50 dark:hover:bg-neutral-800 transition cursor-pointer"
+            >
+              Copiar Link
+            </button>
+          }
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Fornecedor Beneficiário (se registrado no PNCP) -->
+    @if (ata()?.fornecedorNome) {
+      <div class="p-4 bg-emerald-50/50 dark:bg-emerald-950/20 border-b border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div>
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px] font-medium uppercase tracking-wide">Fornecedor Vencedor / Beneficiário</span>
+          <span class="font-bold text-sm text-neutral-900 dark:text-white">{{ ata()?.fornecedorNome }}</span>
+          @if (ata()?.fornecedorNi) {
+            <span class="ml-2 font-mono text-neutral-600 dark:text-neutral-300">CNPJ/CPF: {{ ata()?.fornecedorNi }}</span>
+          }
+        </div>
+
+        @if (ata()?.valorTotal) {
+          <div class="sm:text-right">
+            <span class="text-neutral-500 dark:text-neutral-400 block text-[11px] font-medium uppercase tracking-wide">Valor Homologado da Ata</span>
+            <span class="text-base font-bold text-[#1e7533] dark:text-emerald-400">
+              {{ ata()?.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Objeto / Descrição -->
+    <div class="p-5 border-b border-neutral-200 dark:border-neutral-800">
+      <span class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-1">
+        Objeto da Ata e da Contratação
+      </span>
+      <p class="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-line">
+        {{ ata()?.objeto || detalheCompra()?.objetoCompra || pregao()?.objetoResumido }}
+      </p>
+    </div>
+
+    <!-- Grade de Detalhes da Vigência e Processamento -->
+    <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs border-b border-neutral-200 dark:border-neutral-800">
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Início da Vigência</span>
+        <span class="font-medium text-neutral-900 dark:text-white">
+          {{ ata()?.vigenciaInicio ? (ata()?.vigenciaInicio | date:'dd/MM/yyyy') : 'Não informado' }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Fim da Vigência</span>
+        <span class="font-medium text-neutral-900 dark:text-white">
+          {{ ata()?.vigenciaFim ? (ata()?.vigenciaFim | date:'dd/MM/yyyy') : 'Não informado' }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Data de Assinatura</span>
+        <span class="font-medium text-neutral-900 dark:text-white">
+          {{ ata()?.dataAssinatura ? (ata()?.dataAssinatura | date:'dd/MM/yyyy') : '-' }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Permite Adesão ("Carona")</span>
+        <span class="font-semibold text-[#1e7533] dark:text-emerald-400">
+          {{ ata()?.permiteAdesao ? 'Sim (Permitida nos termos da 14.133/2021)' : 'Não informada' }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">CNPJ do Órgão Gerenciador</span>
+        <span class="font-mono font-medium text-neutral-900 dark:text-white">
+          {{ formatarCnpj(cnpj()) }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Sequencial da Compra</span>
+        <span class="font-mono font-medium text-neutral-900 dark:text-white">
+          {{ seqCompra() }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Número da Ata</span>
+        <span class="font-mono font-medium text-neutral-900 dark:text-white">
+          {{ ata()?.numeroAta || seqAta() }}
+        </span>
+      </div>
+
+      <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Dias Restantes de Vigência</span>
+        <span class="font-bold text-neutral-900 dark:text-white">
+          {{ ata()?.diasRestantes !== undefined ? (ata()?.diasRestantes + ' dias') : '-' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Banner de Integração: Itens no Edital de Origem -->
+    <div class="p-5 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-950/30">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <span>📦</span>
+            <span>Catálogo de Itens e Produtos Licitados</span>
+          </h2>
+          <p class="text-xs text-neutral-600 dark:text-neutral-400 max-w-2xl leading-relaxed">
+            Conforme a modelagem oficial do PNCP, o catálogo completo de itens (especificações, quantidades e valores de referência) é gerenciado no Edital da Licitação.
+          </p>
+        </div>
+
+        <a 
+          [routerLink]="['/edital', cnpj(), ano(), seqCompra()]" 
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#22863a] hover:bg-[#1e7533] rounded shadow-xs transition shrink-0"
+        >
+          <span>Ver Tabela de Itens no Edital</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Seção de Documentos Oficiais e Arquivos da Ata (PDFs) -->
+    <div class="p-5">
+      <h2 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-1.5">
+        <span>📄</span>
+        <span>Documentos e Arquivos da Ata</span>
+      </h2>
+      <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mb-4">
+        Acesse os arquivos e termos contratuais digitalizados publicados pelo órgão no PNCP.
+      </p>
+
+      @if (carregandoArquivos()) {
+        <div class="text-center py-6 text-neutral-400 text-xs">
+          Carregando documentos disponíveis...
+        </div>
+      } @else if (arquivosAta().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          @for (doc of arquivosAta(); track doc.url) {
+            <a 
+              [href]="doc.url" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="flex items-center justify-between p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition group text-xs"
+            >
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <span class="text-red-500 dark:text-red-400 text-base">📄</span>
+                <div class="min-w-0">
+                  <span class="font-medium text-neutral-900 dark:text-white block truncate group-hover:underline">
+                    {{ doc.titulo || doc.tipoDocumentoNome || 'Documento Oficial da Ata' }}
+                  </span>
+                  <span class="text-[10px] text-neutral-500">
+                    Publicado em: {{ doc.dataPublicacaoPncp ? (doc.dataPublicacaoPncp | date:'dd/MM/yyyy') : 'N/D' }}
+                  </span>
+                </div>
+              </div>
+
+              <span class="px-2 py-1 text-[10px] font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded shrink-0">
+                Baixar ↗
+              </span>
+            </a>
+          }
+        </div>
+      } @else {
+        <div class="p-4 rounded border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 text-center">
+          Nenhum arquivo avulso foi disponibilizado diretamente via API. Utilize o botão 
+          <a [href]="ata()?.urlAtaPncp" target="_blank" class="text-[#22863a] font-medium underline">Abrir no PNCP</a> 
+          para consultar o processo integral.
+        </div>
+      }
+    </div>
+
+    <!-- Informações da Origem / Edital Pai -->
+    <div class="p-5 bg-neutral-50 dark:bg-neutral-950/50 border-t border-neutral-200 dark:border-neutral-800 text-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <span class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-0.5">
+            Processo Licitatório de Origem
+          </span>
+          <p class="text-neutral-800 dark:text-neutral-200">
+            Edital nº {{ seqCompra() }}/{{ ano() }} · {{ detalheCompra()?.modalidadeNome || pregao()?.modalidadeNome || 'Pregão - Eletrônico' }}
+          </p>
+        </div>
+
+        <a 
+          [routerLink]="['/edital', cnpj(), ano(), seqCompra()]" 
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#22863a] dark:text-emerald-400 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded font-medium transition"
+        >
+          <span>Ver Edital Completo e Todas as Atas</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+
+  </article>
+</div>

@@ -212,9 +212,10 @@ Para garantir estabilidade em buscas profundas (até 50 páginas / ~1.000 atas),
 
 ## 🗺 Roadmap de Próximas Entregas
 
-- [ ] **Fase 2 - Detalhamento de Itens/Produtos:**
-  - Exibição inline dos produtos da licitação consumindo o endpoint `/itens` do PNCP (descrição detalhada, quantitativos e valores unitários homologados);
-  - Campo de busca interna para localizar produtos dentro do próprio edital.
+- [x] **Fase 2 - Detalhamento de Itens/Produtos:**
+  - [x] Exibição inline dos produtos da licitação consumindo o endpoint oficial `/itens` do PNCP (descrição detalhada, quantitativos, unidades de medida e valores unitários/totais estimados e homologados);
+  - [x] Filtros em tempo real por descrição, número do item e situação (homologados/outros);
+  - [x] Detalhamento do fornecedor adjudicado por lote/item quando disponível.
 - [ ] **Fase 3 - Apoio à Instrução de Processo (SEI / SUAP):**
   - Exportação de atas selecionadas para planilha de Estudo Técnico Preliminar (ETP);
   - Download em 1 clique do Edital e Termo de Referência oficiais via `/arquivos`;

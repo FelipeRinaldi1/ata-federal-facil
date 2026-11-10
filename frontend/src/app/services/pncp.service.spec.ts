@@ -197,4 +197,19 @@ describe('PncpService (Testes Unitários & Integração de Dados)', () => {
       })
     );
   });
+
+  it('deve consultar itens da compra no endpoint oficial e utilizar cache', () => {
+    const fakeItens = [
+      { numeroItem: 1, descricao: 'Cadeira Ergonômica', quantidade: 50, valorUnitarioEstimado: 800 }
+    ];
+    fakeHttp.get.mockReturnValue(of(fakeItens));
+
+    let itensRetornados: any;
+    service.consultarItensCompra('00394460000141', 2024, 1).subscribe(res => {
+      itensRetornados = res;
+    });
+
+    expect(itensRetornados).toEqual(fakeItens);
+    expect(fakeHttp.get).toHaveBeenCalledWith('https://pncp.gov.br/api/pncp/v1/orgaos/00394460000141/compras/2024/1/itens?tamanhoPagina=500');
+  });
 });

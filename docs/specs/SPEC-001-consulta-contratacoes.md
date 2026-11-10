@@ -102,17 +102,20 @@ O **ConsultaContratações** é uma ferramenta web client-side (SPA) voltada a s
 ## 8. Roadmap de Próximas Entregas (Backlog de Evolução)
 
 
-### Fase 2 - Detalhamento de Itens e Produtos (Em Planejamento)
+### Fase 2 - Detalhamento de Itens e Produtos (Concluída)
 * **RF09 - Listagem de Itens/Produtos do Edital:**
   * Consumo sob demanda do endpoint público:
     `GET https://pncp.gov.br/api/pncp/v1/orgaos/{cnpj}/compras/{ano}/{seqCompra}/itens`
   * Exibição de tabela compacta e sóbria contendo:
     - Número do item;
-    - Descrição técnica do produto/bem;
+    - Descrição técnica do produto/bem e informações complementares;
     - Quantidade licitada e unidade de medida;
     - Valor unitário estimado e homologado (R$);
-    - Situação do item (homologado, cancelado, etc.).
+    - Valor total estimado e homologado (R$);
+    - Situação do item (homologado, cancelado, etc.) com badge de status;
+    - Identificação do fornecedor vencedor por item/lote.
   * Campo de busca textual rápida interna sobre os itens do próprio edital.
+  * Filtro por situação do item (`Todos`, `Homologados`, `Outros`).
 
 ### Fase 3 - Instrução Processual de Carona (SEI / SUAP)
 * **RF10 - Exportação para Estudo Técnico Preliminar (ETP):**

@@ -1,0 +1,561 @@
+    <!-- Painel de Busca e Parâmetros -->
+    <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+        
+        <!-- Objeto ou Item -->
+        <div class="sm:col-span-2 lg:col-span-4">
+          <label for="campo-termo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            Objeto ou Item
+          </label>
+          <input 
+            id="campo-termo"
+            type="text" 
+            [ngModel]="termoBusca()"
+            (ngModelChange)="termoBusca.set($event)"
+            (keyup.enter)="executarBusca()"
+            placeholder="Ex: mobiliário escolar, computadores..."
+            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
+          />
+        </div>
+
+        <!-- UF do Órgão -->
+        <div class="lg:col-span-2">
+          <label for="campo-uf" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            UF do Órgão
+          </label>
+          <select 
+            id="campo-uf"
+            [ngModel]="filtroUf()"
+            (ngModelChange)="filtroUf.set($event)"
+            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          >
+            <option value="">Todas as UFs</option>
+            @for (uf of todasUfs; track uf) {
+              <option [value]="uf">{{ uf }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Data Inicial -->
+        <div class="lg:col-span-2">
+          <label for="campo-data-inicial" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            Publicado a partir de
+          </label>
+          <input 
+            id="campo-data-inicial"
+            type="date" 
+            [ngModel]="dataInicial()"
+            (ngModelChange)="dataInicial.set($event)"
+            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          />
+        </div>
+
+        <!-- Data Final -->
+        <div class="lg:col-span-2">
+          <label for="campo-data-final" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            Publicado até
+          </label>
+          <input 
+            id="campo-data-final"
+            type="date" 
+            [ngModel]="dataFinal()"
+            (ngModelChange)="dataFinal.set($event)"
+            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          />
+        </div>
+
+        <!-- Profundidade da Busca -->
+        <div class="lg:col-span-1">
+          <label for="campo-profundidade" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 atas">
+            Páginas
+          </label>
+          <select 
+            id="campo-profundidade"
+            [ngModel]="totalPaginas()"
+            (ngModelChange)="totalPaginas.set($event)"
+            class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          >
+            <option [ngValue]="5">5 (~100)</option>
+            <option [ngValue]="10">10 (~200)</option>
+            <option [ngValue]="15">15 (~300)</option>
+            <option [ngValue]="25">25 (~500)</option>
+            <option [ngValue]="50">50 (~1k)</option>
+          </select>
+        </div>
+
+        <!-- Botão Consultar -->
+        <div class="lg:col-span-1 flex items-end">
+          <button 
+            type="button"
+            (click)="executarBusca()"
+            [disabled]="carregando()"
+            class="w-full py-2 px-3 bg-[#22863a] hover:bg-[#1e7533] text-white text-xs font-medium rounded transition disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            @if (carregando()) {
+              <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            } @else {
+              <span>Buscar</span>
+            }
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Barra de Progresso durante varredura de páginas -->
+      @if (carregando() && progressoCarregamento()) {
+        <div class="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#22863a] animate-pulse"></span>
+            <span>{{ progressoCarregamento() }}</span>
+          </div>
+          <span class="text-[11px] text-neutral-400">Aguarde requisições sequenciais protegidas</span>
+        </div>
+      }
+    </section>
+
+    <!-- Barra de Filtros Refinados, Ordenação e Status de Análise -->
+    <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+      
+      <div class="flex flex-wrap items-center gap-3 flex-1">
+        <!-- Filtro Rápido por Órgão / CNPJ -->
+        <div class="relative w-full sm:w-64">
+          <input 
+            type="text" 
+            [ngModel]="filtroOrgao()"
+            (ngModelChange)="filtroOrgao.set($event)"
+            placeholder="Filtrar por Órgão ou CNPJ..."
+            class="w-full pl-7 pr-3 py-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
+          />
+          <svg class="w-3.5 h-3.5 text-neutral-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+
+        <!-- Filtro por Status de Análise (Checkmark) -->
+        <div class="flex items-center gap-1.5">
+          <label for="filtro-status-analise" class="text-neutral-500 dark:text-neutral-400 font-medium">
+            Análise:
+          </label>
+          <select 
+            id="filtro-status-analise"
+            [ngModel]="filtroStatusAnalise()"
+            (ngModelChange)="filtroStatusAnalise.set($event)"
+            class="px-2 py-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-[#22863a]"
+          >
+            <option value="todos">Todos os status</option>
+            <option value="pendente">Não visto (Pendente)</option>
+            <option value="em-analise">Incompleto (Em análise)</option>
+            <option value="analisado">Visto (Completo)</option>
+          </select>
+        </div>
+
+        <!-- Ordenação Dinâmica dos Editais -->
+        <div class="flex items-center gap-1.5">
+          <label for="ordenacao-editais" class="text-neutral-500 dark:text-neutral-400 font-medium">
+            Ordenar:
+          </label>
+          <select 
+            id="ordenacao-editais"
+            [ngModel]="ordenacao()"
+            (ngModelChange)="ordenacao.set($event)"
+            class="px-2 py-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-[#22863a]"
+          >
+            <option value="mais-atas">Mais Atas</option>
+            <option value="maior-vigencia">Maior Vigência Restante</option>
+            <option value="mais-recente">Mais Recente (Publicação)</option>
+            <option value="nao-vistos-primeiro">Priorizar Não Vistos</option>
+            <option value="orgao-az">Órgão (A → Z)</option>
+          </select>
+        </div>
+
+        @if (filtroOrgao() || filtroUf() || filtroStatusAnalise() !== 'todos' || ordenacao() !== 'mais-atas') {
+          <button 
+            type="button"
+            (click)="limparFiltros()"
+            class="text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 underline cursor-pointer"
+          >
+            Limpar filtros
+          </button>
+        }
+      </div>
+
+      <!-- Controles de Visualização Rápida -->
+      <div class="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+        <button 
+          type="button"
+          (click)="expandirTodos()"
+          class="hover:text-neutral-900 dark:hover:text-neutral-200 underline cursor-pointer"
+        >
+          Expandir todos
+        </button>
+        <span>·</span>
+        <button 
+          type="button"
+          (click)="recolherTodos()"
+          class="hover:text-neutral-900 dark:hover:text-neutral-200 underline cursor-pointer"
+        >
+          Recolher todos
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Resumo dos Resultados / Estatísticas Sóbrias -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 px-1 text-xs text-neutral-600 dark:text-neutral-400">
+      <div>
+        Exibindo <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ estatisticas().totalPregoes }}</span> editais / pregões 
+        (<span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ estatisticas().totalAtas }}</span> atas vigentes com adesão permitida)
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Seletor de Itens por Página: 5, 10, 20 -->
+        <div class="flex items-center gap-1.5">
+          <span class="text-[11px] text-neutral-500">Por página:</span>
+          @for (qtd of [5, 10, 20]; track qtd) {
+            <button
+              type="button"
+              (click)="definirItensPorPagina(qtd)"
+              class="px-2 py-0.5 rounded text-[11px] border transition cursor-pointer"
+              [class.bg-[#22863a]]="itensPorPagina() === qtd"
+              [class.text-white]="itensPorPagina() === qtd"
+              [class.border-[#22863a]]="itensPorPagina() === qtd"
+              [class.bg-white]="itensPorPagina() !== qtd"
+              [class.dark:bg-neutral-800]="itensPorPagina() !== qtd"
+              [class.border-neutral-300]="itensPorPagina() !== qtd"
+              [class.dark:border-neutral-700]="itensPorPagina() !== qtd"
+              [class.text-neutral-700]="itensPorPagina() !== qtd"
+              [class.dark:text-neutral-300]="itensPorPagina() !== qtd"
+            >
+              {{ qtd }}
+            </button>
+          }
+        </div>
+
+        <!-- Notificação flutuante de cópia -->
+        @if (feedbackCopiado()) {
+          <span class="text-xs text-[#22863a] font-medium animate-fade-in">
+            ✓ {{ feedbackCopiado() }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Feedback de Erro ou Vazio -->
+    @if (erro()) {
+      <div class="p-3 mb-4 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/80 text-neutral-800 dark:text-neutral-200 text-xs">
+        {{ erro() }}
+      </div>
+    }
+
+    <!-- Lista de Pregões Agrupados (Cards Sóbrios) -->
+    <div class="space-y-3">
+      @for (pregao of pregoesPaginados(); track pregao.chavePregao) {
+        <article 
+          class="rounded-lg border transition-all"
+          [class.bg-white]="pregao.statusAnalise !== 'analisado'"
+          [class.dark:bg-neutral-900]="pregao.statusAnalise !== 'analisado'"
+          [class.border-neutral-200]="pregao.statusAnalise !== 'analisado'"
+          [class.dark:border-neutral-800]="pregao.statusAnalise !== 'analisado'"
+          [class.bg-slate-50]="pregao.statusAnalise === 'analisado'"
+          [class.dark:bg-neutral-900/60]="pregao.statusAnalise === 'analisado'"
+          [class.border-slate-300]="pregao.statusAnalise === 'analisado'"
+          [class.dark:border-neutral-700]="pregao.statusAnalise === 'analisado'"
+        >
+          <!-- Cabeçalho do Card (Edital Pai) -->
+          <div class="p-4">
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-3">
+              
+              <div class="flex items-start gap-3 flex-1">
+                <!-- Checkbox de 3 Estados do Pregão (Vazio, Incompleto, Completo) -->
+                <button 
+                  type="button"
+                  (click)="statusAnaliseService.togglePregao(obterIdsAtas(pregao))"
+                  [title]="obterTituloCheckPregao(pregao.statusAnalise)"
+                  class="mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 cursor-pointer transition"
+                  [class.border-neutral-400]="pregao.statusAnalise === 'pendente'"
+                  [class.dark:border-neutral-600]="pregao.statusAnalise === 'pendente'"
+                  [class.bg-white]="pregao.statusAnalise === 'pendente'"
+                  [class.dark:bg-neutral-800]="pregao.statusAnalise === 'pendente'"
+                  [class.border-amber-500]="pregao.statusAnalise === 'em-analise'"
+                  [class.bg-amber-100]="pregao.statusAnalise === 'em-analise'"
+                  [class.dark:bg-amber-900/40]="pregao.statusAnalise === 'em-analise'"
+                  [class.text-amber-800]="pregao.statusAnalise === 'em-analise'"
+                  [class.dark:text-amber-300]="pregao.statusAnalise === 'em-analise'"
+                  [class.border-slate-700]="pregao.statusAnalise === 'analisado'"
+                  [class.dark:border-neutral-500]="pregao.statusAnalise === 'analisado'"
+                  [class.bg-slate-800]="pregao.statusAnalise === 'analisado'"
+                  [class.dark:bg-neutral-700]="pregao.statusAnalise === 'analisado'"
+                  [class.text-white]="pregao.statusAnalise === 'analisado'"
+                >
+                  @if (pregao.statusAnalise === 'analisado') {
+                    <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  } @else if (pregao.statusAnalise === 'em-analise') {
+                    <span class="w-2 h-0.5 bg-amber-800 dark:bg-amber-300 rounded"></span>
+                  }
+                </button>
+
+                <div class="space-y-1 flex-1">
+                  <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ pregao.modalidadeNome }}</span>
+                    <span class="text-neutral-300 dark:text-neutral-700">·</span>
+                    <span class="text-neutral-600 dark:text-neutral-400">Ano {{ pregao.ano }}</span>
+                    @if (pregao.uf) {
+                      <span class="text-neutral-300 dark:text-neutral-700">·</span>
+                      <span class="text-neutral-600 dark:text-neutral-400">UF: {{ pregao.uf }}</span>
+                    }
+                    <span class="text-neutral-300 dark:text-neutral-700">·</span>
+                    <span class="text-neutral-500 dark:text-neutral-500 font-mono">CNPJ: {{ pregao.cnpjFormatado }}</span>
+                    
+                    @if (pregao.statusAnalise === 'analisado') {
+                      <span class="px-1.5 py-0.2 bg-slate-200 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 text-[10px] rounded font-medium">Visto</span>
+                    } @else if (pregao.statusAnalise === 'em-analise') {
+                      <span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-[10px] rounded font-medium">Incompleto</span>
+                    }
+                  </div>
+
+                  <h2 class="text-sm font-semibold text-neutral-900 dark:text-white leading-snug">
+                    <a 
+                      [routerLink]="['/edital', pregao.cnpj, pregao.ano, pregao.seqCompra]"
+                      title="Ver página de detalhes deste Edital"
+                      class="hover:text-[#22863a] dark:hover:text-emerald-400 transition underline-offset-2 hover:underline cursor-pointer"
+                    >
+                      {{ pregao.nomeOrgao }}
+                    </a>
+                  </h2>
+
+                  @if (pregao.unidadeNome && pregao.unidadeNome !== pregao.nomeOrgao) {
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                      Unidade: {{ pregao.unidadeNome }}
+                    </p>
+                  }
+                </div>
+              </div>
+
+              <!-- Ações do Edital -->
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1 rounded">
+                  {{ pregao.atasFiltradas.length }} ata(s)
+                </span>
+
+                <a 
+                  [routerLink]="['/edital', pregao.cnpj, pregao.ano, pregao.seqCompra]"
+                  class="px-2.5 py-1 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded transition font-medium"
+                >
+                  Ver Edital
+                </a>
+
+                <a 
+                  [href]="pregao.linkPregaoPncp" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-white bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded transition"
+                >
+                  PNCP ↗
+                </a>
+
+                <button 
+                  type="button"
+                  (click)="copiarTexto(pregao.linkPregaoPncp, 'Link do Edital')"
+                  title="Copiar link do edital"
+                  class="px-2 py-1 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-300 dark:border-neutral-700 rounded hover:bg-neutral-50 dark:hover:bg-neutral-800 transition cursor-pointer"
+                >
+                  Copiar Link
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Objeto -->
+            <div class="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+              <span class="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-0.5">
+                Objeto
+              </span>
+              <p class="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                {{ pregao.objetoResumido }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Barra de Abertura das Atas -->
+          <div class="bg-neutral-50 dark:bg-neutral-800/60 px-4 py-2 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+            <button 
+              type="button"
+              (click)="toggleExpandirPregao(pregao.chavePregao)"
+              class="text-xs font-medium text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white flex items-center gap-1 cursor-pointer"
+            >
+              <span>{{ pregao.expandido ? '▼ Ocultar Atas' : '▶ Ver Atas (' + pregao.atasFiltradas.length + ')' }}</span>
+            </button>
+
+            <span class="text-[11px] text-neutral-400 dark:text-neutral-500 font-mono">
+              Compra: {{ pregao.seqCompra }}
+            </span>
+          </div>
+
+          <!-- Gaveta de Atas -->
+          @if (pregao.expandido) {
+            <div class="border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-950 p-3 space-y-2">
+              @for (ata of pregao.atasFiltradas; track ata.id) {
+                <div 
+                  class="border rounded p-3 text-xs transition-colors"
+                  [class.bg-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.dark:bg-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.border-neutral-200]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.dark:border-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.bg-slate-50]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.dark:bg-neutral-900/40]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.border-slate-300]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                  [class.dark:border-neutral-800]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                >
+                  <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    
+                    <div class="flex items-start gap-2.5 flex-1">
+                      <!-- Checkbox individual da Ata -->
+                      <button 
+                        type="button"
+                        (click)="statusAnaliseService.toggleAta(ata.id, pregao.chavePregao)"
+                        [title]="statusAnaliseService.isAtaAnalisada(ata.id) ? 'Marcar como não vista' : 'Marcar como já vista/analisada'"
+                        class="mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 cursor-pointer transition"
+                        [class.border-neutral-300]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:border-neutral-700]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.bg-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:bg-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.border-slate-700]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:border-neutral-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.bg-slate-800]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:bg-neutral-700]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.text-white]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                      >
+                        @if (statusAnaliseService.isAtaAnalisada(ata.id)) {
+                          <svg class="w-3 h-3 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        }
+                      </button>
+
+                      <div class="space-y-1 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <a 
+                            [routerLink]="['/ata', pregao.cnpj, pregao.ano, pregao.seqCompra, ata.seqAta]"
+                            class="font-semibold hover:text-[#22863a] dark:hover:text-emerald-400 transition underline-offset-2 hover:underline cursor-pointer"
+                            [class.text-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                            [class.dark:text-neutral-100]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                            [class.text-neutral-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                            [class.dark:text-neutral-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                            [class.line-through]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                          >
+                            {{ ata.titulo }}
+                          </a>
+                          
+                          @if (ata.statusVigencia === 'vigente') {
+                            <span class="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium text-[11px]">
+                              Vigente ({{ ata.diasRestantes }} dias)
+                            </span>
+                          } @else if (ata.statusVigencia === 'prestes-a-vencer') {
+                            <span class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 font-medium text-[11px]">
+                              Vence em breve ({{ ata.diasRestantes }} dias)
+                            </span>
+                          }
+
+                          @if (statusAnaliseService.isAtaAnalisada(ata.id)) {
+                            <span class="text-[10px] text-slate-500 dark:text-neutral-400 font-medium">Analisada</span>
+                          }
+                        </div>
+
+                        @if (ata.fornecedorNome) {
+                          <p class="text-neutral-700 dark:text-neutral-300">
+                            Fornecedor: <span class="font-medium text-neutral-900 dark:text-white">{{ ata.fornecedorNome }}</span>
+                            @if (ata.fornecedorNi) {
+                              <span class="text-neutral-500 dark:text-neutral-400 font-mono">({{ ata.fornecedorNi }})</span>
+                            }
+                          </p>
+                        }
+
+                        <div class="text-neutral-500 dark:text-neutral-400 flex flex-wrap gap-x-3 text-[11px]">
+                          @if (ata.vigenciaInicio) {
+                            <span>Início: {{ ata.vigenciaInicio | date:'dd/MM/yyyy' }}</span>
+                          }
+                          @if (ata.vigenciaFim) {
+                            <span>Fim: {{ ata.vigenciaFim | date:'dd/MM/yyyy' }}</span>
+                          }
+                          @if (ata.valorTotal) {
+                            <span>Valor: {{ ata.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                      <a 
+                        [routerLink]="['/ata', pregao.cnpj, pregao.ano, pregao.seqCompra, ata.seqAta]"
+                        class="px-2.5 py-1 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded transition font-medium"
+                      >
+                        Ver Ata
+                      </a>
+
+                      <a 
+                        [href]="ata.urlAtaPncp" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="px-2.5 py-1 text-xs text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded transition"
+                      >
+                        PNCP ↗
+                      </a>
+
+                      <button 
+                        type="button"
+                        (click)="copiarTexto(ata.urlAtaPncp, 'Link da Ata')"
+                        title="Copiar link da ata"
+                        class="px-2 py-1 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-300 dark:border-neutral-700 rounded hover:bg-neutral-50 dark:hover:bg-neutral-800 transition cursor-pointer"
+                      >
+                        Copiar
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+        </article>
+      } @empty {
+        @if (!carregando() && !erro()) {
+          <div class="text-center py-12 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-6">
+            <h3 class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Nenhum pregão federal encontrado</h3>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+              Verifique o termo pesquisado, tente selecionar outra UF ou altere o filtro de status de análise.
+            </p>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Barra de Paginação da Home -->
+    @if (totalPaginasHome() > 1) {
+      <div class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mt-4 px-2 py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg">
+        <span>
+          Página <strong class="text-neutral-900 dark:text-white">{{ paginaAtual() }}</strong> de {{ totalPaginasHome() }}
+          ({{ pregoesFiltrados().length }} pregões encontrados)
+        </span>
+        <div class="flex items-center gap-1.5">
+          <button 
+            type="button"
+            (click)="mudarPagina(-1)"
+            [disabled]="paginaAtual() <= 1"
+            class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition font-medium"
+          >
+            ← Anterior
+          </button>
+          <button 
+            type="button"
+            (click)="mudarPagina(1)"
+            [disabled]="paginaAtual() >= totalPaginasHome()"
+            class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition font-medium"
+          >
+            Próxima →
+          </button>
+        </div>
+      </div>
+    }
