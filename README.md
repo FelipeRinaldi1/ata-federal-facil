@@ -1,6 +1,6 @@
-# Consulta Contratações Públicas
+# AtaFácil · Consulta e Adesão a Atas de Registro de Preços
 
-> **Localizador inteligente de Atas de Registro de Preços (ARP) e Editais para Adesão ("Carona") na Esfera Federal.**  
+> **Localizador inteligente de Atas de Registro de Preços (ARP) e Itens para Adesão ("Carona") na Esfera Federal.**  
 > Uma ferramenta web client-side (SPA) desenvolvida para simplificar e acelerar as rotinas de compras públicas em Institutos Federais, Universidades e órgãos federais.
 
 [![Angular](https://img.shields.io/badge/Angular-22%2B-DD0031?logo=angular&logoColor=white)](https://angular.dev/)

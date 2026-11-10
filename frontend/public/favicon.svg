@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="7" fill="#22863A"/>
+  <!-- Contorno de Documento / Ata Oficial -->
+  <path d="M9 7C9 5.89543 9.89543 5 11 5H17.5858C18.1163 5 18.6251 5.21071 19 5.58579L22.4142 9C22.7893 9.37486 23 9.88362 23 10.4142V23C23 24.1046 22.1046 25 21 25H11C9.89543 25 9 24.1046 9 23V7Z" stroke="#FFFFFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Linhas do Documento -->
+  <path d="M13 11H16" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M13 15H19" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Lente de Busca de Contratações e Itens -->
+  <circle cx="19" cy="20" r="4" fill="#22863A" stroke="#FFFFFF" stroke-width="1.75"/>
+  <path d="M22 23L25 26" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+</svg>
