@@ -90,11 +90,11 @@ export class BuscaProfundaPage {
         valA = a.numeroItem;
         valB = b.numeroItem;
       } else if (coluna === 'descricao') {
-        valA = a.descricao;
-        valB = b.descricao;
+        valA = a.descricao || '';
+        valB = b.descricao || '';
       } else if (coluna === 'orgao') {
-        valA = a.nomeOrgao;
-        valB = b.nomeOrgao;
+        valA = a.nomeOrgao || '';
+        valB = b.nomeOrgao || '';
       } else if (coluna === 'valorTotal') {
         valA = a.valorTotalHomologado || a.valorTotal || 0;
         valB = b.valorTotalHomologado || b.valorTotal || 0;
@@ -103,8 +103,10 @@ export class BuscaProfundaPage {
         valB = b.quantidade || 0;
       }
 
-      if (typeof valA === 'string') {
-        const comp = this.normalizar(valA).localeCompare(this.normalizar(valB));
+      if (typeof valA === 'string' || typeof valB === 'string') {
+        const strA = this.normalizar(String(valA || ''));
+        const strB = this.normalizar(String(valB || ''));
+        const comp = strA.localeCompare(strB, 'pt-BR', { sensitivity: 'base' });
         return asc ? comp : -comp;
       }
 

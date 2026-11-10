@@ -115,6 +115,60 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
     expect(ordenados[0].numeroItem).toBe(2); // 800 > 100
   });
 
+  it('deve ordenar alfabeticamente pela descricao do item crescente e decrescente', () => {
+    page.todosItensEncontrados.set([
+      {
+        numeroItem: 1,
+        descricao: 'Zíper para pastas',
+        cnpj: '1',
+        cnpjFormatado: '1',
+        ano: 2026,
+        seqCompra: '1',
+        nomeOrgao: 'Org 1',
+        linkPregaoPncp: ''
+      },
+      {
+        numeroItem: 2,
+        descricao: 'Armário de aço',
+        cnpj: '2',
+        cnpjFormatado: '2',
+        ano: 2026,
+        seqCompra: '2',
+        nomeOrgao: 'Org 2',
+        linkPregaoPncp: ''
+      },
+      {
+        numeroItem: 3,
+        descricao: 'Cadeira ergonômica',
+        cnpj: '3',
+        cnpjFormatado: '3',
+        ano: 2026,
+        seqCompra: '3',
+        nomeOrgao: 'Org 3',
+        linkPregaoPncp: ''
+      }
+    ]);
+
+    // Ordenação A-Z (crescente)
+    page.mudarOrdenacao('descricao');
+    expect(page.ordenacaoColuna()).toBe('descricao');
+    expect(page.ordenacaoAsc()).toBe(true);
+
+    let ordenados = page.itensFiltrados();
+    expect(ordenados[0].descricao).toBe('Armário de aço');
+    expect(ordenados[1].descricao).toBe('Cadeira ergonômica');
+    expect(ordenados[2].descricao).toBe('Zíper para pastas');
+
+    // Clicar novamente inverte para Z-A (decrescente)
+    page.mudarOrdenacao('descricao');
+    expect(page.ordenacaoAsc()).toBe(false);
+
+    ordenados = page.itensFiltrados();
+    expect(ordenados[0].descricao).toBe('Zíper para pastas');
+    expect(ordenados[1].descricao).toBe('Cadeira ergonômica');
+    expect(ordenados[2].descricao).toBe('Armário de aço');
+  });
+
   it('deve destacar termos no texto com segurança contra XSS', () => {
     const texto = 'Fornecimento de <img src=x onerror=alert(1)> cadeiras pretas';
     const termo = 'cadeiras';

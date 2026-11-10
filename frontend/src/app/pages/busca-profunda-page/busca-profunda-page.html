@@ -266,36 +266,66 @@
               scope="col" 
               (click)="mudarOrdenacao('numero')"
               class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white w-14"
+              title="Clique para ordenar por número do item"
             >
-              Nº
+              <div class="flex items-center gap-1">
+                <span>Nº</span>
+                @if (ordenacaoColuna() === 'numero') {
+                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
+                }
+              </div>
             </th>
             <th 
               scope="col" 
               (click)="mudarOrdenacao('descricao')"
               class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white min-w-[280px]"
+              title="Clique para ordenar alfabeticamente pela descrição do item (A-Z ou Z-A)"
             >
-              Descrição do Item
+              <div class="flex items-center gap-1">
+                <span>Descrição do Item</span>
+                @if (ordenacaoColuna() === 'descricao') {
+                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
+                }
+              </div>
             </th>
             <th 
               scope="col" 
               (click)="mudarOrdenacao('quantidade')"
               class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white w-24 text-right"
+              title="Clique para ordenar por quantidade"
             >
-              Qtd / Unid
+              <div class="flex items-center justify-end gap-1">
+                <span>Qtd / Unid</span>
+                @if (ordenacaoColuna() === 'quantidade') {
+                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
+                }
+              </div>
             </th>
             <th 
               scope="col" 
               (click)="mudarOrdenacao('valorTotal')"
               class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white w-28 text-right"
+              title="Clique para ordenar por valor total"
             >
-              Valor Total
+              <div class="flex items-center justify-end gap-1">
+                <span>Valor Total</span>
+                @if (ordenacaoColuna() === 'valorTotal') {
+                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
+                }
+              </div>
             </th>
             <th 
               scope="col" 
               (click)="mudarOrdenacao('orgao')"
               class="py-2.5 px-3 font-semibold cursor-pointer hover:text-neutral-900 dark:hover:text-white min-w-[220px]"
+              title="Clique para ordenar alfabeticamente por órgão"
             >
-              Órgão Licitante (Edital)
+              <div class="flex items-center gap-1">
+                <span>Órgão Licitante (Edital)</span>
+                @if (ordenacaoColuna() === 'orgao') {
+                  <span class="text-[10px] text-neutral-800 dark:text-neutral-200">{{ ordenacaoAsc() ? '▲' : '▼' }}</span>
+                }
+              </div>
             </th>
             <th scope="col" class="py-2.5 px-3 font-semibold w-24 text-center">
               Ações
