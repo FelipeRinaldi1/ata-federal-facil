@@ -33,8 +33,9 @@ export class ThemeService {
       const salvo = localStorage.getItem(this.STORAGE_KEY);
       if (salvo) {
         prefereEscuro = salvo === 'dark';
-      } else if (typeof window !== 'undefined' && window.matchMedia) {
-        prefereEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } else {
+        // Padrão obrigatório da aplicação: Modo Claro (Light Mode)
+        prefereEscuro = false;
       }
     } catch (e) {
       console.warn('Erro ao ler preferência de tema:', e);

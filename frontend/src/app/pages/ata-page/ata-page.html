@@ -10,16 +10,18 @@
 
   <!-- Navegação de Retorno -->
   <nav class="mb-5 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-    <a routerLink="/" class="hover:text-neutral-900 dark:hover:text-neutral-100 flex items-center gap-1 transition">
-      <span>←</span>
+    <a routerLink="/" class="hover:text-[#22863a] dark:hover:text-emerald-400 flex items-center gap-1.5 transition font-medium">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
       <span>Início</span>
     </a>
-    <span>/</span>
-    <a [routerLink]="['/edital', cnpj(), ano(), seqCompra()]" class="hover:text-neutral-900 dark:hover:text-neutral-100 transition">
+    <span class="text-neutral-300 dark:text-neutral-700">/</span>
+    <a [routerLink]="['/edital', cnpj(), ano(), seqCompra()]" class="hover:text-[#22863a] dark:hover:text-emerald-400 transition">
       Edital nº {{ seqCompra() }}/{{ ano() }}
     </a>
-    <span>/</span>
-    <span class="text-neutral-800 dark:text-neutral-200 font-medium">
+    <span class="text-neutral-300 dark:text-neutral-700">/</span>
+    <span class="text-neutral-900 dark:text-neutral-100 font-semibold">
       Ata nº {{ ata()?.numeroAta || seqAta() }}
     </span>
   </nav>
@@ -214,8 +216,10 @@
     <div class="p-5 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-950/30">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-1.5">
-            <span>📦</span>
+          <h2 class="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-2">
+            <svg class="w-4 h-4 text-[#22863a] dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
             <span>Catálogo de Itens e Produtos Licitados</span>
           </h2>
           <p class="text-xs text-neutral-600 dark:text-neutral-400 max-w-2xl leading-relaxed">
@@ -225,18 +229,22 @@
 
         <a 
           [routerLink]="['/edital', cnpj(), ano(), seqCompra()]" 
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#22863a] hover:bg-[#1e7533] rounded shadow-xs transition shrink-0"
+          class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#22863a] hover:bg-[#1e7533] active:scale-[0.98] rounded shadow-xs transition shrink-0"
         >
           <span>Ver Tabela de Itens no Edital</span>
-          <span>→</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
         </a>
       </div>
     </div>
 
     <!-- Seção de Documentos Oficiais e Arquivos da Ata (PDFs) -->
     <div class="p-5">
-      <h2 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-1.5">
-        <span>📄</span>
+      <h2 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider mb-1 flex items-center gap-2">
+        <svg class="w-4 h-4 text-[#22863a] dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
         <span>Documentos e Arquivos da Ata</span>
       </h2>
       <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mb-4">
@@ -254,12 +262,14 @@
               [href]="doc.url" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="flex items-center justify-between p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition group text-xs"
+              class="flex items-center justify-between p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition group text-xs active:scale-[0.99]"
             >
               <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                <span class="text-red-500 dark:text-red-400 text-base">📄</span>
+                <svg class="w-5 h-5 text-[#22863a] dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
                 <div class="min-w-0">
-                  <span class="font-medium text-neutral-900 dark:text-white block truncate group-hover:underline">
+                  <span class="font-medium text-neutral-900 dark:text-white block truncate group-hover:text-[#22863a] dark:group-hover:text-emerald-400">
                     {{ doc.titulo || doc.tipoDocumentoNome || 'Documento Oficial da Ata' }}
                   </span>
                   <span class="text-[10px] text-neutral-500">
@@ -268,8 +278,11 @@
                 </div>
               </div>
 
-              <span class="px-2 py-1 text-[10px] font-medium text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded shrink-0">
-                Baixar ↗
+              <span class="px-2.5 py-1 text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded shrink-0 group-hover:bg-[#22863a] group-hover:text-white group-hover:border-[#22863a] transition inline-flex items-center gap-1">
+                <span>Baixar</span>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
               </span>
             </a>
           }
@@ -300,7 +313,9 @@
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#22863a] dark:text-emerald-400 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded font-medium transition"
         >
           <span>Ver Edital Completo e Todas as Atas</span>
-          <span>→</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
         </a>
       </div>
     </div>

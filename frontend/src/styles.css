@@ -8,4 +8,9 @@
     --brand-forest-hover: #1e7533;
     --brand-ruby: #b91c1c;
   }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variant-numeric: tabular-nums;
+  }
 }
