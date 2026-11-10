@@ -42,7 +42,9 @@ jobs:
 
       - name: Build application
         working-directory: frontend
-        run: npm run build -- --base-href /consulta-contratacoes/
+        run: |
+          npm run build -- --base-href /consulta-contratacoes/
+          cp dist/frontend/browser/index.html dist/frontend/browser/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

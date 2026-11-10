@@ -177,6 +177,10 @@ ConsultaContratacoes/
 │   │   ├── app/
 │   │   │   ├── models/
 │   │   │   │   └── pncp.models.ts         # Contratos e tipos da API PNCP
+│   │   │   ├── pages/
+│   │   │   │   ├── home-page/             # Página principal de busca e agregação
+│   │   │   │   ├── edital-page/           # Detalhe do Edital, itens e downloads
+│   │   │   │   └── ata-page/              # Detalhe individual da Ata e PDFs
 │   │   │   ├── services/
 │   │   │   │   ├── pncp.service.ts        # Integração e lógica de agrupamento
 │   │   │   │   ├── pncp.service.spec.ts   # Testes unitários do serviço PNCP
@@ -184,10 +188,10 @@ ConsultaContratacoes/
 │   │   │   │   ├── status-analise.service.spec.ts # Testes de persistência
 │   │   │   │   ├── theme.service.ts       # Controle de Dark/Light mode
 │   │   │   │   └── theme.service.spec.ts  # Testes de tema
-│   │   │   ├── app.ts                     # Componente raiz com Signals
-│   │   │   ├── app.html                   # Template limpo com @if / @for
-│   │   │   ├── app.spec.ts                # Testes de integração do componente
-│   │   │   └── app.config.ts              # Provedores (HttpClient, Zoneless/Zone)
+│   │   │   ├── app.ts                     # Componente shell com roteador
+│   │   │   ├── app.html                   # Layout institucional
+│   │   │   ├── app.routes.ts              # Rotas SPA com HashLocationStrategy
+│   │   │   └── app.config.ts              # Provedores (HttpClient, pt-BR locale)
 │   │   ├── main.ts                        # Bootstrap da aplicação
 │   │   └── styles.css                     # Tailwind CSS v4 + tema personalizado
 │   ├── package.json
@@ -217,9 +221,8 @@ Para garantir estabilidade em buscas profundas (até 50 páginas / ~1.000 atas),
   - [x] Filtros em tempo real por descrição, número do item e situação (homologados/outros);
   - [x] Detalhamento do fornecedor adjudicado por lote/item quando disponível.
 - [ ] **Fase 3 - Apoio à Instrução de Processo (SEI / SUAP):**
-  - Exportação de atas selecionadas para planilha de Estudo Técnico Preliminar (ETP);
-  - Download em 1 clique do Edital e Termo de Referência oficiais via `/arquivos`;
-  - Campo de anotações internas para histórico de contatos com o órgão gerenciador.
+  - [x] Download direto de Editais, Termos de Referência e documentos oficiais de Atas e Compras via endpoints `/arquivos` do PNCP;
+  - [ ] Exportação de atas selecionadas para planilha de Estudo Técnico Preliminar (ETP).
 
 ---
 
