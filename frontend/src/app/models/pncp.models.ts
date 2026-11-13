@@ -13,6 +13,8 @@ export interface PncpAtaSearchItem {
   orgao_cnpj?: string;
   orgao_nome?: string;
   orgao_subrogado_nome?: string;
+  unidade_codigo?: string;
+  codigo_unidade?: string;
   unidade_nome?: string;
   esfera_id?: string;
   esfera_nome?: string;
@@ -170,6 +172,7 @@ export interface PregaoAgrupado {
   ano: number;
   seqCompra: string;
   nomeOrgao: string;
+  uasg?: string;
   unidadeNome?: string;
   uf?: string;
   municipio?: string;
@@ -208,6 +211,7 @@ export interface ItemBuscaProfunda {
   ano: number;
   seqCompra: string;
   nomeOrgao: string;
+  uasg?: string;
   unidadeNome?: string;
   uf?: string;
   linkPregaoPncp: string;

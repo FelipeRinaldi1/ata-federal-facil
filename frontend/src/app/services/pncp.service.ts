@@ -418,6 +418,7 @@ export class PncpService {
           ano,
           seqCompra,
           nomeOrgao: item.orgao_nome || 'Órgão Desconhecido',
+          uasg: item.unidade_codigo || item.codigo_unidade || undefined,
           unidadeNome: item.unidade_nome || undefined,
           uf: item.uf,
           municipio: item.municipio_nome,

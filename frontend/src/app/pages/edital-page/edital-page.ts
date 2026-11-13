@@ -160,6 +160,7 @@ export class EditalPage implements OnInit {
             ano: Number(ano),
             seqCompra,
             nomeOrgao: detalhe.orgaoEntidade?.razaoSocial || 'Órgão Federal',
+            uasg: detalhe.unidadeOrgao?.codigoUnidade,
             unidadeNome: detalhe.unidadeOrgao?.nomeUnidade,
             uf: detalhe.unidadeOrgao?.ufSigla,
             municipio: detalhe.unidadeOrgao?.municipioNome,

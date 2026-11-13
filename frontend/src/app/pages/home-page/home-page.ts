@@ -101,12 +101,13 @@ export class HomePage {
           return false;
         }
 
-        // Filtro por Órgão (Nome ou CNPJ ou Unidade)
+        // Filtro por Órgão (Nome, Unidade, UASG ou CNPJ)
         if (orgaoTerm) {
           const nomeMatch = this.normalizar(p.nomeOrgao).includes(orgaoTerm);
           const unidadeMatch = p.unidadeNome ? this.normalizar(p.unidadeNome).includes(orgaoTerm) : false;
+          const uasgMatch = p.uasg ? this.normalizar(p.uasg).includes(orgaoTerm) : false;
           const cnpjMatch = p.cnpj.includes(orgaoTerm) || p.cnpjFormatado.includes(orgaoTerm);
-          if (!nomeMatch && !unidadeMatch && !cnpjMatch) return false;
+          if (!nomeMatch && !unidadeMatch && !uasgMatch && !cnpjMatch) return false;
         }
 
         return true;

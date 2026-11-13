@@ -135,13 +135,13 @@
     <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
       
       <div class="flex flex-wrap items-center gap-3 flex-1">
-        <!-- Filtro Rápido por Órgão / CNPJ -->
+        <!-- Filtro Rápido por Órgão / UASG -->
         <div class="relative w-full sm:w-64">
           <input 
             type="text" 
             [ngModel]="filtroOrgao()"
             (ngModelChange)="filtroOrgao.set($event)"
-            placeholder="Filtrar por Órgão ou CNPJ..."
+            placeholder="Filtrar por Órgão ou UASG..."
             class="w-full pl-7 pr-3 py-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
           />
           <svg class="w-3.5 h-3.5 text-neutral-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,8 +326,10 @@
                       <span class="text-neutral-300 dark:text-neutral-700">·</span>
                       <span class="text-neutral-600 dark:text-neutral-400">UF: {{ pregao.uf }}</span>
                     }
-                    <span class="text-neutral-300 dark:text-neutral-700">·</span>
-                    <span class="text-neutral-500 dark:text-neutral-500 font-mono">CNPJ: {{ pregao.cnpjFormatado }}</span>
+                    @if (pregao.uasg) {
+                      <span class="text-neutral-300 dark:text-neutral-700">·</span>
+                      <span class="text-neutral-500 dark:text-neutral-500 font-mono">UASG: {{ pregao.uasg }}</span>
+                    }
                     
                     @if (pregao.statusAnalise === 'analisado') {
                       <span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-900/50 text-[#1e7533] dark:text-emerald-300 text-[10px] rounded font-medium border border-emerald-200 dark:border-emerald-800">Concluído</span>

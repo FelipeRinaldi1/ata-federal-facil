@@ -1,20 +1,32 @@
 <div class="space-y-4">
   <!-- Navegação de Retorno e Breadcrumb -->
   <div class="flex items-center justify-between">
-    <a 
-      routerLink="/" 
+    <a
+      routerLink="/"
       class="inline-flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white transition font-medium"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        ></path>
       </svg>
       <span>Voltar para a Busca</span>
     </a>
 
     @if (feedbackCopiado()) {
-      <span class="inline-flex items-center gap-1.5 text-xs text-[#22863a] dark:text-emerald-400 font-medium animate-fade-in bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+      <span
+        class="inline-flex items-center gap-1.5 text-xs text-[#22863a] dark:text-emerald-400 font-medium animate-fade-in bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800"
+      >
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M5 13l4 4L19 7"
+          ></path>
         </svg>
         <span>{{ feedbackCopiado() }}</span>
       </span>
@@ -22,34 +34,51 @@
   </div>
 
   @if (carregando()) {
-    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-8 text-center">
-      <div class="w-6 h-6 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-      <p class="text-xs text-neutral-600 dark:text-neutral-400">Carregando detalhes do Edital no PNCP...</p>
+    <div
+      class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-8 text-center"
+    >
+      <div
+        class="w-6 h-6 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin mx-auto mb-3"
+      ></div>
+      <p class="text-xs text-neutral-600 dark:text-neutral-400">
+        Carregando detalhes do Edital no PNCP...
+      </p>
     </div>
   } @else if (erro() && !pregao()) {
-    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 text-center">
+    <div
+      class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 text-center"
+    >
       <p class="text-xs text-red-600 dark:text-red-400 font-medium">{{ erro() }}</p>
-      <a routerLink="/" class="mt-3 inline-block text-xs text-[#22863a] underline">Retornar à página inicial</a>
+      <a routerLink="/" class="mt-3 inline-block text-xs text-[#22863a] underline"
+        >Retornar à página inicial</a
+      >
     </div>
   } @else {
     <!-- Painel Principal do Edital -->
-    <article class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-xs">
-      
+    <article
+      class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-xs"
+    >
       <!-- Cabeçalho -->
       <div class="p-5 border-b border-neutral-200 dark:border-neutral-800">
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div class="space-y-1.5 flex-1">
             <div class="flex flex-wrap items-center gap-2 text-xs">
-              <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium">
+              <span
+                class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium"
+              >
                 {{ detalheCompra()?.tipoInstrumentoConvocatorioNome || 'Edital' }}
               </span>
               <span class="font-semibold text-neutral-900 dark:text-neutral-100">
-                {{ detalheCompra()?.modalidadeNome || pregao()?.modalidadeNome || 'Pregão Eletrônico' }}
+                {{
+                  detalheCompra()?.modalidadeNome || pregao()?.modalidadeNome || 'Pregão Eletrônico'
+                }}
               </span>
               <span class="text-neutral-300 dark:text-neutral-700">·</span>
               <span class="text-neutral-600 dark:text-neutral-400">Ano {{ ano() }}</span>
               <span class="text-neutral-300 dark:text-neutral-700">·</span>
-              <span class="text-neutral-600 dark:text-neutral-400">Sequencial Compra: {{ seqCompra() }}</span>
+              <span class="text-neutral-600 dark:text-neutral-400"
+                >Sequencial Compra: {{ seqCompra() }}</span
+              >
             </div>
 
             <h1 class="text-lg font-bold text-neutral-900 dark:text-white leading-tight">
@@ -58,12 +87,15 @@
 
             @if (detalheCompra()?.unidadeOrgao?.nomeUnidade || pregao()?.unidadeNome) {
               <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                Unidade Compradora: 
+                Unidade Compradora:
                 <span class="font-medium text-neutral-800 dark:text-neutral-200">
                   {{ detalheCompra()?.unidadeOrgao?.nomeUnidade || pregao()?.unidadeNome }}
                 </span>
                 @if (detalheCompra()?.unidadeOrgao?.ufSigla || pregao()?.uf) {
-                  <span> ({{ detalheCompra()?.unidadeOrgao?.ufSigla || pregao()?.uf }} - {{ detalheCompra()?.unidadeOrgao?.municipioNome || pregao()?.municipio }})</span>
+                  <span>
+                    ({{ detalheCompra()?.unidadeOrgao?.ufSigla || pregao()?.uf }} -
+                    {{ detalheCompra()?.unidadeOrgao?.municipioNome || pregao()?.municipio }})</span
+                  >
                 }
               </p>
             }
@@ -72,19 +104,29 @@
           <!-- Ações -->
           <div class="flex items-center gap-2 shrink-0">
             @if (pregao()) {
-              <a 
-                [href]="pregao()!.linkPregaoPncp" 
-                target="_blank" 
+              <a
+                [href]="pregao()!.linkPregaoPncp"
+                target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded transition font-medium active:scale-[0.98]"
               >
                 <span>Abrir no PNCP</span>
-                <svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                <svg
+                  class="w-3.5 h-3.5 text-neutral-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  ></path>
                 </svg>
               </a>
 
-              <button 
+              <button
                 type="button"
                 (click)="copiarTexto(pregao()!.linkPregaoPncp, 'Link do Edital')"
                 class="px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-300 dark:border-neutral-700 rounded hover:bg-neutral-50 dark:hover:bg-neutral-800 transition cursor-pointer"
@@ -97,17 +139,25 @@
       </div>
 
       <!-- Objeto Completo -->
-      <div class="p-5 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/40">
-        <span class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-1">
+      <div
+        class="p-5 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/40"
+      >
+        <span
+          class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-1"
+        >
           Objeto da Contratação
         </span>
-        <p class="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-line">
+        <p
+          class="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-line"
+        >
           {{ detalheCompra()?.objetoCompra || pregao()?.objetoResumido }}
         </p>
 
         @if (detalheCompra()?.informacaoComplementar) {
           <div class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-800">
-            <span class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-1">
+            <span
+              class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide block mb-1"
+            >
               Informações Complementares
             </span>
             <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
@@ -119,68 +169,120 @@
 
       <!-- Grade de Metadados e Valores -->
       <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">CNPJ do Órgão</span>
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >UASG</span
+          >
+          <span class="font-mono text-neutral-900 dark:text-white">
+            {{ detalheCompra()?.unidadeOrgao?.codigoUnidade || pregao()?.uasg || '-' }}
+          </span>
+        </div>
+
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >CNPJ do Órgão</span
+          >
           <span class="font-mono font-medium text-neutral-900 dark:text-white">
             {{ formatarCnpj(cnpj()) }}
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Número de Controle PNCP</span>
-          <span class="font-mono text-[11px] text-neutral-900 dark:text-white truncate block" [title]="detalheCompra()?.numeroControlePNCP || ''">
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >Número de Controle PNCP</span
+          >
+          <span
+            class="font-mono text-[11px] text-neutral-900 dark:text-white truncate block"
+            [title]="detalheCompra()?.numeroControlePNCP || ''"
+          >
             {{ detalheCompra()?.numeroControlePNCP || '-' }}
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Valor Total Estimado</span>
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >Valor Total Estimado</span
+          >
           <span class="font-medium text-neutral-900 dark:text-white">
             @if (detalheCompra()?.valorTotalEstimado) {
-              {{ detalheCompra()?.valorTotalEstimado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              {{
+                detalheCompra()?.valorTotalEstimado | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+              }}
             } @else {
               Não informado / sigiloso
             }
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Valor Homologado</span>
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >Valor Homologado</span
+          >
           <span class="font-medium text-neutral-900 dark:text-white">
             @if (detalheCompra()?.valorTotalHomologado) {
-              {{ detalheCompra()?.valorTotalHomologado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              {{
+                detalheCompra()?.valorTotalHomologado
+                  | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+              }}
             } @else {
               -
             }
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Processo Administrativo</span>
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >Processo Administrativo</span
+          >
           <span class="font-mono text-neutral-900 dark:text-white">
             {{ detalheCompra()?.processo || '-' }}
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
           <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Amparo Legal</span>
           <span class="text-neutral-900 dark:text-white">
             {{ detalheCompra()?.amparoLegal?.nome || 'Lei 14.133/2021' }}
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Modo de Disputa</span>
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >Modo de Disputa</span
+          >
           <span class="text-neutral-900 dark:text-white">
             {{ detalheCompra()?.modoDisputaNome || '-' }}
           </span>
         </div>
 
-        <div class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800">
-          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]">Data de Publicação</span>
+        <div
+          class="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded border border-neutral-200 dark:border-neutral-800"
+        >
+          <span class="text-neutral-500 dark:text-neutral-400 block text-[11px]"
+            >Data de Publicação</span
+          >
           <span class="text-neutral-900 dark:text-white">
             @if (detalheCompra()?.dataPublicacaoPncp || pregao()?.dataPublicacao) {
-              {{ (detalheCompra()?.dataPublicacaoPncp || pregao()?.dataPublicacao) | date:'dd/MM/yyyy HH:mm' }}
+              {{
+                detalheCompra()?.dataPublicacaoPncp || pregao()?.dataPublicacao
+                  | date: 'dd/MM/yyyy HH:mm'
+              }}
             } @else {
               -
             }
@@ -190,17 +292,26 @@
 
       <!-- Links de Origem -->
       @if (detalheCompra()?.linkSistemaOrigem) {
-        <div class="px-5 py-3 bg-neutral-100 dark:bg-neutral-800/80 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between text-xs">
-          <span class="text-neutral-600 dark:text-neutral-400">Sistema Comprador de Origem (Compras.gov.br / Outro):</span>
-          <a 
-            [href]="detalheCompra()?.linkSistemaOrigem" 
-            target="_blank" 
+        <div
+          class="px-5 py-3 bg-neutral-100 dark:bg-neutral-800/80 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between text-xs"
+        >
+          <span class="text-neutral-600 dark:text-neutral-400"
+            >Sistema Comprador de Origem (Compras.gov.br / Outro):</span
+          >
+          <a
+            [href]="detalheCompra()?.linkSistemaOrigem"
+            target="_blank"
             rel="noopener noreferrer"
             class="text-[#22863a] dark:text-emerald-400 font-medium hover:underline inline-flex items-center gap-1"
           >
             <span>Acessar Acompanhamento da Compra</span>
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              ></path>
             </svg>
           </a>
         </div>
@@ -210,35 +321,55 @@
       <div class="p-5 border-t border-neutral-200 dark:border-neutral-800">
         <div class="flex items-center justify-between mb-2">
           <div>
-            <h2 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-              <svg class="w-4 h-4 text-[#22863a] dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <h2
+              class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2"
+            >
+              <svg
+                class="w-4 h-4 text-[#22863a] dark:text-emerald-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
               </svg>
               <span>Documentos e Arquivos do Edital</span>
               @if (arquivosEdital().length > 0) {
-                <span class="px-2 py-0.2 rounded-full text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium">
+                <span
+                  class="px-2 py-0.2 rounded-full text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium"
+                >
                   {{ arquivosEdital().length }}
                 </span>
               }
             </h2>
             <p class="text-[11px] text-neutral-500 dark:text-neutral-400">
-              Download direto do Edital, Termo de Referência (TR), Anexos e documentos oficiais disponibilizados pelo órgão no PNCP.
+              Download direto do Edital, Termo de Referência (TR), Anexos e documentos oficiais
+              disponibilizados pelo órgão no PNCP.
             </p>
           </div>
 
-          <button 
+          <button
             type="button"
             (click)="secaoArquivosRecolhida.set(!secaoArquivosRecolhida())"
             class="text-xs text-[#22863a] dark:text-emerald-400 hover:text-[#1e7533] dark:hover:text-emerald-300 font-medium flex items-center gap-1.5 cursor-pointer active:scale-[0.98] transition"
           >
-            <svg 
-              class="w-3.5 h-3.5 transition-transform duration-200" 
-              [class.rotate-90]="!secaoArquivosRecolhida()" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              class="w-3.5 h-3.5 transition-transform duration-200"
+              [class.rotate-90]="!secaoArquivosRecolhida()"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
             </svg>
             <span>{{ secaoArquivosRecolhida() ? 'Expandir' : 'Recolher' }}</span>
           </button>
@@ -246,49 +377,80 @@
 
         @if (!secaoArquivosRecolhida()) {
           @if (carregandoArquivos()) {
-            <div class="py-4 text-center text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-center gap-2">
-              <div class="w-4 h-4 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin"></div>
+            <div
+              class="py-4 text-center text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-center gap-2"
+            >
+              <div
+                class="w-4 h-4 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin"
+              ></div>
               <span>Carregando arquivos oficiais do edital...</span>
             </div>
           } @else if (arquivosEdital().length > 0) {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
               @for (doc of arquivosEdital(); track doc.url) {
-                <a 
-                  [href]="doc.url" 
-                  target="_blank" 
+                <a
+                  [href]="doc.url"
+                  target="_blank"
                   rel="noopener noreferrer"
                   class="flex items-center justify-between p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition group text-xs active:scale-[0.99]"
                 >
                   <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                    <svg class="w-5 h-5 text-[#22863a] dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    <svg
+                      class="w-5 h-5 text-[#22863a] dark:text-emerald-400 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.8"
+                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      ></path>
                     </svg>
                     <div class="min-w-0">
-                      <span class="font-medium text-neutral-900 dark:text-white block truncate group-hover:text-[#22863a] dark:group-hover:text-emerald-400">
+                      <span
+                        class="font-medium text-neutral-900 dark:text-white block truncate group-hover:text-[#22863a] dark:group-hover:text-emerald-400"
+                      >
                         {{ doc.titulo || doc.tipoDocumentoNome || 'Documento do Edital' }}
                       </span>
                       <span class="text-[10px] text-neutral-500 block truncate">
                         {{ doc.tipoDocumentoNome || 'Edital / Anexo' }}
                         @if (doc.dataPublicacaoPncp) {
-                          · {{ doc.dataPublicacaoPncp | date:'dd/MM/yyyy' }}
+                          · {{ doc.dataPublicacaoPncp | date: 'dd/MM/yyyy' }}
                         }
                       </span>
                     </div>
                   </div>
 
-                  <span class="px-2.5 py-1 text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded shrink-0 group-hover:bg-[#22863a] group-hover:text-white group-hover:border-[#22863a] transition inline-flex items-center gap-1">
+                  <span
+                    class="px-2.5 py-1 text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded shrink-0 group-hover:bg-[#22863a] group-hover:text-white group-hover:border-[#22863a] transition inline-flex items-center gap-1"
+                  >
                     <span>Baixar</span>
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      ></path>
                     </svg>
                   </span>
                 </a>
               }
             </div>
           } @else {
-            <div class="p-4 rounded border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 text-center mt-3 bg-neutral-50 dark:bg-neutral-800/30">
-              Nenhum documento avulso retornado via API. Você pode acessar diretamente pelo portal através do botão 
-              <a [href]="pregao()?.linkPregaoPncp" target="_blank" class="text-[#22863a] font-medium underline">Abrir no PNCP</a>.
+            <div
+              class="p-4 rounded border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 text-center mt-3 bg-neutral-50 dark:bg-neutral-800/30"
+            >
+              Nenhum documento avulso retornado via API. Você pode acessar diretamente pelo portal
+              através do botão
+              <a
+                [href]="pregao()?.linkPregaoPncp"
+                target="_blank"
+                class="text-[#22863a] font-medium underline"
+                >Abrir no PNCP</a
+              >.
             </div>
           }
         }
@@ -296,33 +458,44 @@
     </article>
 
     <!-- Seção Fase 2: Itens e Produtos da Licitação -->
-    <section class="mt-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-5">
+    <section
+      class="mt-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-5"
+    >
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
-          <button 
-            type="button" 
-            (click)="toggleSecaoItens()"
-            class="text-left group cursor-pointer"
-          >
-            <h2 class="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
-              <svg 
-                class="w-3.5 h-3.5 text-neutral-500 group-hover:text-[#22863a] transition-transform duration-200" 
-                [class.rotate-90]="!secaoItensRecolhida()" 
-                fill="none" 
-                stroke="currentColor" 
+          <button type="button" (click)="toggleSecaoItens()" class="text-left group cursor-pointer">
+            <h2
+              class="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2"
+            >
+              <svg
+                class="w-3.5 h-3.5 text-neutral-500 group-hover:text-[#22863a] transition-transform duration-200"
+                [class.rotate-90]="!secaoItensRecolhida()"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
               </svg>
               <span>Itens e Produtos da Licitação</span>
               @if (itensCompra().length > 0) {
-                <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-medium">
+                <span
+                  class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-medium"
+                >
                   {{ itensCompra().length }} itens
                 </span>
               }
             </h2>
             <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-              {{ secaoItensRecolhida() ? 'Clique para expandir e ver os produtos licitados.' : 'Consumo oficial do endpoint de itens do PNCP para consulta de quantitativos e valores unitários.' }}
+              {{
+                secaoItensRecolhida()
+                  ? 'Clique para expandir e ver os produtos licitados.'
+                  : 'Consumo oficial do endpoint de itens do PNCP para consulta de quantitativos e valores unitários.'
+              }}
             </p>
           </button>
         </div>
@@ -354,20 +527,30 @@
 
             <!-- Campo de Busca Interna de Produtos -->
             <div class="relative w-full sm:w-56">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 [ngModel]="termoBuscaItens()"
                 (ngModelChange)="termoBuscaItens.set($event); paginaItensAtual.set(1)"
                 placeholder="Buscar produto ou item..."
                 class="w-full pl-7 pr-3 py-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
               />
-              <svg class="w-3.5 h-3.5 text-neutral-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              <svg
+                class="w-3.5 h-3.5 text-neutral-400 absolute left-2 top-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
               </svg>
             </div>
 
             <!-- Filtro de Situação -->
-            <select 
+            <select
               [ngModel]="filtroSituacaoItem()"
               (ngModelChange)="filtroSituacaoItem.set($event); paginaItensAtual.set(1)"
               class="px-2 py-1.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-[#22863a]"
@@ -378,8 +561,8 @@
             </select>
 
             @if (termoBuscaItens() || filtroSituacaoItem() !== 'todos') {
-              <button 
-                type="button" 
+              <button
+                type="button"
                 (click)="limparFiltroItens()"
                 class="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 underline cursor-pointer"
               >
@@ -391,170 +574,243 @@
       </div>
 
       @if (!secaoItensRecolhida()) {
-
-      <!-- Estado de Carregamento dos Itens -->
-      @if (carregandoItens()) {
-        <div class="p-8 text-center text-xs text-neutral-500 dark:text-neutral-400">
-          <div class="w-5 h-5 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          Carregando relação de itens e produtos no PNCP...
-        </div>
-      } @else if (itensCompra().length === 0) {
-        <div class="p-6 text-center text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-950/40 rounded border border-neutral-200 dark:border-neutral-800">
-          Nenhum item individual foi retornado pela API do PNCP para esta contratação.
-        </div>
-      } @else {
-        <!-- Tabela Compacta e Sóbria de Itens -->
-        <div class="overflow-x-auto border border-neutral-200 dark:border-neutral-800 rounded">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 border-b border-neutral-200 dark:border-neutral-800 uppercase text-[10px] tracking-wider">
-              <tr>
-                <th class="py-2.5 px-3 w-14 text-center">Item</th>
-                <th class="py-2.5 px-3 min-w-[280px]">Descrição do Produto / Serviço</th>
-                <th class="py-2.5 px-3 w-32 text-right">Qtd / Medida</th>
-                <th class="py-2.5 px-3 w-32 text-right">Valor Unitário</th>
-                <th class="py-2.5 px-3 w-32 text-right">Valor Total</th>
-                <th class="py-2.5 px-3 w-28 text-center">Situação</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800 text-neutral-800 dark:text-neutral-200">
-              @for (item of itensPaginados(); track item.numeroItem) {
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors">
-                  <td class="py-2.5 px-3 text-center font-mono font-medium text-neutral-500 dark:text-neutral-400">
-                    {{ item.numeroItem }}
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <p class="font-medium text-neutral-900 dark:text-white leading-snug">
-                      {{ item.descricao }}
-                    </p>
-                    @if (item.informacaoComplementar) {
-                      <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">
-                        {{ item.informacaoComplementar }}
-                      </p>
-                    }
-                    @if (item.nomeRazaoSocialFornecedor) {
-                      <span class="inline-block text-[10px] text-emerald-800 dark:text-emerald-300 mt-1">
-                        Fornecedor: <strong>{{ item.nomeRazaoSocialFornecedor }}</strong>
-                      </span>
-                    }
-                  </td>
-                  <td class="py-2.5 px-3 text-right">
-                    <span class="font-mono">{{ item.quantidade !== undefined ? item.quantidade : '-' }}</span>
-                    @if (item.unidadeMedida) {
-                      <span class="ml-1 text-[11px] text-neutral-500 uppercase">({{ item.unidadeMedida }})</span>
-                    }
-                  </td>
-                  <td class="py-2.5 px-3 text-right font-medium">
-                    @if (item.valorUnitarioHomologado) {
-                      <span class="text-[#1e7533] dark:text-emerald-400">{{ item.valorUnitarioHomologado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
-                    } @else if (item.valorUnitarioEstimado) {
-                      <span>{{ item.valorUnitarioEstimado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
-                    } @else {
-                      <span class="text-neutral-400">-</span>
-                    }
-                  </td>
-                  <td class="py-2.5 px-3 text-right font-semibold">
-                    @if (item.valorTotalHomologado) {
-                      <span class="text-[#1e7533] dark:text-emerald-400">{{ item.valorTotalHomologado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
-                    } @else if (item.valorTotal) {
-                      <span>{{ item.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
-                    } @else {
-                      <span class="text-neutral-400">-</span>
-                    }
-                  </td>
-                  <td class="py-2.5 px-3 text-center">
-                    <span 
-                      class="px-2 py-0.5 rounded text-[10px] font-medium inline-block"
-                      [class.bg-emerald-50]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.dark:bg-emerald-950/40]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.text-[#1e7533]]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.dark:text-emerald-400]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.border]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.border-emerald-200]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.dark:border-emerald-800]="(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.bg-neutral-100]="!(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.dark:bg-neutral-800]="!(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.text-neutral-600]="!(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                      [class.dark:text-neutral-400]="!(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')"
-                    >
-                      {{ item.situacaoCompraItemNome || 'Informado' }}
-                    </span>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="6" class="py-6 text-center text-neutral-500 dark:text-neutral-400">
-                    Nenhum produto corresponde ao filtro "{{ termoBuscaItens() }}".
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Barra de Paginação dos Itens -->
-        @if (totalPaginasItens() > 1) {
-          <div class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mt-3 px-1">
-            <span>
-              Página <strong class="text-neutral-900 dark:text-white">{{ paginaItensAtual() }}</strong> de {{ totalPaginasItens() }}
-              ({{ itensFiltrados().length }} itens)
-            </span>
-            <div class="flex items-center gap-1.5">
-              <button 
-                type="button"
-                (click)="mudarPaginaItens(-1)"
-                [disabled]="paginaItensAtual() <= 1"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                <span>Anterior</span>
-              </button>
-              <button 
-                type="button"
-                (click)="mudarPaginaItens(1)"
-                [disabled]="paginaItensAtual() >= totalPaginasItens()"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
-              >
-                <span>Próxima</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
+        <!-- Estado de Carregamento dos Itens -->
+        @if (carregandoItens()) {
+          <div class="p-8 text-center text-xs text-neutral-500 dark:text-neutral-400">
+            <div
+              class="w-5 h-5 border-2 border-[#22863a] border-t-transparent rounded-full animate-spin mx-auto mb-2"
+            ></div>
+            Carregando relação de itens e produtos no PNCP...
           </div>
+        } @else if (itensCompra().length === 0) {
+          <div
+            class="p-6 text-center text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-950/40 rounded border border-neutral-200 dark:border-neutral-800"
+          >
+            Nenhum item individual foi retornado pela API do PNCP para esta contratação.
+          </div>
+        } @else {
+          <!-- Tabela Compacta e Sóbria de Itens -->
+          <div class="overflow-x-auto border border-neutral-200 dark:border-neutral-800 rounded">
+            <table class="w-full text-left text-xs">
+              <thead
+                class="bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 border-b border-neutral-200 dark:border-neutral-800 uppercase text-[10px] tracking-wider"
+              >
+                <tr>
+                  <th class="py-2.5 px-3 w-14 text-center">Item</th>
+                  <th class="py-2.5 px-3 min-w-[280px]">Descrição do Produto / Serviço</th>
+                  <th class="py-2.5 px-3 w-32 text-right">Qtd / Medida</th>
+                  <th class="py-2.5 px-3 w-32 text-right">Valor Unitário</th>
+                  <th class="py-2.5 px-3 w-32 text-right">Valor Total</th>
+                  <th class="py-2.5 px-3 w-28 text-center">Situação</th>
+                </tr>
+              </thead>
+              <tbody
+                class="divide-y divide-neutral-200 dark:divide-neutral-800 text-neutral-800 dark:text-neutral-200"
+              >
+                @for (item of itensPaginados(); track item.numeroItem) {
+                  <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors">
+                    <td
+                      class="py-2.5 px-3 text-center font-mono font-medium text-neutral-500 dark:text-neutral-400"
+                    >
+                      {{ item.numeroItem }}
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <p class="font-medium text-neutral-900 dark:text-white leading-snug">
+                        {{ item.descricao }}
+                      </p>
+                      @if (item.informacaoComplementar) {
+                        <p
+                          class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2"
+                        >
+                          {{ item.informacaoComplementar }}
+                        </p>
+                      }
+                      @if (item.nomeRazaoSocialFornecedor) {
+                        <span
+                          class="inline-block text-[10px] text-emerald-800 dark:text-emerald-300 mt-1"
+                        >
+                          Fornecedor: <strong>{{ item.nomeRazaoSocialFornecedor }}</strong>
+                        </span>
+                      }
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                      <span class="font-mono">{{
+                        item.quantidade !== undefined ? item.quantidade : '-'
+                      }}</span>
+                      @if (item.unidadeMedida) {
+                        <span class="ml-1 text-[11px] text-neutral-500 uppercase"
+                          >({{ item.unidadeMedida }})</span
+                        >
+                      }
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-medium">
+                      @if (item.valorUnitarioHomologado) {
+                        <span class="text-[#1e7533] dark:text-emerald-400">{{
+                          item.valorUnitarioHomologado
+                            | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                        }}</span>
+                      } @else if (item.valorUnitarioEstimado) {
+                        <span>{{
+                          item.valorUnitarioEstimado
+                            | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                        }}</span>
+                      } @else {
+                        <span class="text-neutral-400">-</span>
+                      }
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-semibold">
+                      @if (item.valorTotalHomologado) {
+                        <span class="text-[#1e7533] dark:text-emerald-400">{{
+                          item.valorTotalHomologado | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                        }}</span>
+                      } @else if (item.valorTotal) {
+                        <span>{{
+                          item.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                        }}</span>
+                      } @else {
+                        <span class="text-neutral-400">-</span>
+                      }
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <span
+                        class="px-2 py-0.5 rounded text-[10px] font-medium inline-block"
+                        [class.bg-emerald-50]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.dark:bg-emerald-950/40]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.text-[#1e7533]]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.dark:text-emerald-400]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.border]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.border-emerald-200]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.dark:border-emerald-800]="
+                          (item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.bg-neutral-100]="
+                          !(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.dark:bg-neutral-800]="
+                          !(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.text-neutral-600]="
+                          !(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                        [class.dark:text-neutral-400]="
+                          !(item.situacaoCompraItemNome || '').toLowerCase().includes('homolog')
+                        "
+                      >
+                        {{ item.situacaoCompraItemNome || 'Informado' }}
+                      </span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="py-6 text-center text-neutral-500 dark:text-neutral-400">
+                      Nenhum produto corresponde ao filtro "{{ termoBuscaItens() }}".
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Barra de Paginação dos Itens -->
+          @if (totalPaginasItens() > 1) {
+            <div
+              class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mt-3 px-1"
+            >
+              <span>
+                Página
+                <strong class="text-neutral-900 dark:text-white">{{ paginaItensAtual() }}</strong>
+                de {{ totalPaginasItens() }} ({{ itensFiltrados().length }} itens)
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="mudarPaginaItens(-1)"
+                  [disabled]="paginaItensAtual() <= 1"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 19l-7-7 7-7"
+                    ></path>
+                  </svg>
+                  <span>Anterior</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="mudarPaginaItens(1)"
+                  [disabled]="paginaItensAtual() >= totalPaginasItens()"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
+                >
+                  <span>Próxima</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          }
         }
       }
-    }
     </section>
 
     <!-- Lista de Atas Vinculadas a este Edital -->
-    <section class="mt-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-5">
+    <section
+      class="mt-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-5"
+    >
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-        <button 
-          type="button" 
-          (click)="toggleSecaoAtas()"
-          class="text-left group cursor-pointer"
-        >
-          <h2 class="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
-            <svg 
-              class="w-3.5 h-3.5 text-neutral-500 group-hover:text-[#22863a] transition-transform duration-200" 
-              [class.rotate-90]="!secaoAtasRecolhida()" 
-              fill="none" 
-              stroke="currentColor" 
+        <button type="button" (click)="toggleSecaoAtas()" class="text-left group cursor-pointer">
+          <h2
+            class="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-2"
+          >
+            <svg
+              class="w-3.5 h-3.5 text-neutral-500 group-hover:text-[#22863a] transition-transform duration-200"
+              [class.rotate-90]="!secaoAtasRecolhida()"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              ></path>
             </svg>
             <span>Atas de Registro de Preços do Edital</span>
             @if (pregao()?.atas?.length) {
-              <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-medium">
+              <span
+                class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-medium"
+              >
                 {{ pregao()?.atas?.length }} ata(s)
               </span>
             }
           </h2>
           <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            {{ secaoAtasRecolhida() ? 'Clique para expandir as atas registradas para este edital.' : 'Contratos e atas de registro de preços originadas deste processo licitatório.' }}
+            {{
+              secaoAtasRecolhida()
+                ? 'Clique para expandir as atas registradas para este edital.'
+                : 'Contratos e atas de registro de preços originadas deste processo licitatório.'
+            }}
           </p>
         </button>
 
@@ -588,131 +844,175 @@
         @if (pregao() && pregao()!.atas.length > 0) {
           <div class="space-y-2">
             @for (ata of atasPaginadas(); track ata.id) {
-            <div 
-              class="rounded-lg p-4 text-xs transition border"
-              [class.bg-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.dark:bg-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.border-neutral-200]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.dark:border-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.bg-emerald-50/50]="statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.dark:bg-emerald-950/25]="statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.border-emerald-200]="statusAnaliseService.isAtaAnalisada(ata.id)"
-              [class.dark:border-emerald-900/50]="statusAnaliseService.isAtaAnalisada(ata.id)"
-            >
-              <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div class="space-y-1 flex-1">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <a 
-                      [routerLink]="['/ata', cnpj(), ano(), seqCompra(), ata.seqAta]"
-                      class="font-semibold text-sm hover:text-[#22863a] dark:hover:text-emerald-400 transition underline-offset-2 hover:underline cursor-pointer"
-                      [class.line-through]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                      [class.text-neutral-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
-                      [class.text-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
-                      [class.dark:text-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+              <div
+                class="rounded-lg p-4 text-xs transition border"
+                [class.bg-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.dark:bg-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.border-neutral-200]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.dark:border-neutral-800]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.bg-emerald-50/50]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.dark:bg-emerald-950/25]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.border-emerald-200]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                [class.dark:border-emerald-900/50]="statusAnaliseService.isAtaAnalisada(ata.id)"
+              >
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div class="space-y-1 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <a
+                        [routerLink]="['/ata', cnpj(), ano(), seqCompra(), ata.seqAta]"
+                        class="font-semibold text-sm hover:text-[#22863a] dark:hover:text-emerald-400 transition underline-offset-2 hover:underline cursor-pointer"
+                        [class.line-through]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.text-neutral-500]="statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.text-neutral-900]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                        [class.dark:text-white]="!statusAnaliseService.isAtaAnalisada(ata.id)"
+                      >
+                        {{ ata.titulo }}
+                      </a>
+
+                      @if (ata.statusVigencia === 'vigente') {
+                        <span
+                          class="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium text-[11px]"
+                        >
+                          Vigente ({{ ata.diasRestantes }} dias)
+                        </span>
+                      } @else if (ata.statusVigencia === 'prestes-a-vencer') {
+                        <span
+                          class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 font-medium text-[11px]"
+                        >
+                          Vence em breve ({{ ata.diasRestantes }} dias)
+                        </span>
+                      } @else if (ata.statusVigencia === 'expirada') {
+                        <span
+                          class="px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 font-medium text-[11px]"
+                        >
+                          Expirada
+                        </span>
+                      }
+
+                      <span class="text-neutral-400 font-mono text-[11px]"
+                        >Seq: {{ ata.seqAta }}</span
+                      >
+                    </div>
+
+                    @if (ata.fornecedorNome) {
+                      <p class="text-neutral-700 dark:text-neutral-300">
+                        Fornecedor Beneficiário:
+                        <strong class="text-neutral-900 dark:text-white">{{
+                          ata.fornecedorNome
+                        }}</strong>
+                        @if (ata.fornecedorNi) {
+                          <span class="text-neutral-500 font-mono">({{ ata.fornecedorNi }})</span>
+                        }
+                      </p>
+                    }
+
+                    <div
+                      class="text-neutral-500 dark:text-neutral-400 flex flex-wrap gap-x-4 text-[11px] pt-1"
                     >
-                      {{ ata.titulo }}
+                      @if (ata.vigenciaFim) {
+                        <span>Vence em: {{ ata.vigenciaFim | date: 'dd/MM/yyyy' }}</span>
+                      }
+                      @if (ata.valorTotal) {
+                        <span
+                          >Valor Global:
+                          <strong>{{
+                            ata.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                          }}</strong></span
+                        >
+                      }
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 shrink-0">
+                    <a
+                      [routerLink]="['/ata', cnpj(), ano(), seqCompra(), ata.seqAta]"
+                      class="px-2.5 py-1 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded transition font-medium"
+                    >
+                      Detalhes da Ata
                     </a>
 
-                    @if (ata.statusVigencia === 'vigente') {
-                      <span class="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-[#1e7533] dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-medium text-[11px]">
-                        Vigente ({{ ata.diasRestantes }} dias)
-                      </span>
-                    } @else if (ata.statusVigencia === 'prestes-a-vencer') {
-                      <span class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 font-medium text-[11px]">
-                        Vence em breve ({{ ata.diasRestantes }} dias)
-                      </span>
-                    } @else if (ata.statusVigencia === 'expirada') {
-                      <span class="px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 font-medium text-[11px]">
-                        Expirada
-                      </span>
-                    }
-
-                    <span class="text-neutral-400 font-mono text-[11px]">Seq: {{ ata.seqAta }}</span>
-                  </div>
-
-                  @if (ata.fornecedorNome) {
-                    <p class="text-neutral-700 dark:text-neutral-300">
-                      Fornecedor Beneficiário: <strong class="text-neutral-900 dark:text-white">{{ ata.fornecedorNome }}</strong>
-                      @if (ata.fornecedorNi) {
-                        <span class="text-neutral-500 font-mono">({{ ata.fornecedorNi }})</span>
-                      }
-                    </p>
-                  }
-
-                  <div class="text-neutral-500 dark:text-neutral-400 flex flex-wrap gap-x-4 text-[11px] pt-1">
-                    @if (ata.vigenciaFim) {
-                      <span>Vence em: {{ ata.vigenciaFim | date:'dd/MM/yyyy' }}</span>
-                    }
-                    @if (ata.valorTotal) {
-                      <span>Valor Global: <strong>{{ ata.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
-                    }
+                    <a
+                      [href]="ata.urlAtaPncp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1 px-2.5 py-1 text-xs text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded transition active:scale-[0.98]"
+                    >
+                      <span>PNCP</span>
+                      <svg
+                        class="w-3 h-3 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        ></path>
+                      </svg>
+                    </a>
                   </div>
                 </div>
+              </div>
+            }
+          </div>
 
-                <div class="flex items-center gap-2 shrink-0">
-                  <a 
-                    [routerLink]="['/ata', cnpj(), ano(), seqCompra(), ata.seqAta]"
-                    class="px-2.5 py-1 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded transition font-medium"
-                  >
-                    Detalhes da Ata
-                  </a>
-
-                  <a 
-                    [href]="ata.urlAtaPncp" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 px-2.5 py-1 text-xs text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded transition active:scale-[0.98]"
-                  >
-                    <span>PNCP</span>
-                    <svg class="w-3 h-3 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                    </svg>
-                  </a>
-                </div>
+          <!-- Barra de Paginação das Atas -->
+          @if (totalPaginasAtas() > 1) {
+            <div
+              class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mt-3 px-1"
+            >
+              <span>
+                Página
+                <strong class="text-neutral-900 dark:text-white">{{ paginaAtasAtual() }}</strong> de
+                {{ totalPaginasAtas() }} ({{ pregao()?.atas?.length }} atas)
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="mudarPaginaAtas(-1)"
+                  [disabled]="paginaAtasAtual() <= 1"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 19l-7-7 7-7"
+                    ></path>
+                  </svg>
+                  <span>Anterior</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="mudarPaginaAtas(1)"
+                  [disabled]="paginaAtasAtual() >= totalPaginasAtas()"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
+                >
+                  <span>Próxima</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    ></path>
+                  </svg>
+                </button>
               </div>
             </div>
           }
-        </div>
-
-        <!-- Barra de Paginação das Atas -->
-        @if (totalPaginasAtas() > 1) {
-          <div class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mt-3 px-1">
-            <span>
-              Página <strong class="text-neutral-900 dark:text-white">{{ paginaAtasAtual() }}</strong> de {{ totalPaginasAtas() }}
-              ({{ pregao()?.atas?.length }} atas)
-            </span>
-            <div class="flex items-center gap-1.5">
-              <button 
-                type="button"
-                (click)="mudarPaginaAtas(-1)"
-                [disabled]="paginaAtasAtual() <= 1"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                <span>Anterior</span>
-              </button>
-              <button 
-                type="button"
-                (click)="mudarPaginaAtas(1)"
-                [disabled]="paginaAtasAtual() >= totalPaginasAtas()"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
-              >
-                <span>Próxima</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
+        } @else {
+          <div
+            class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 text-center text-xs text-neutral-500 dark:text-neutral-400"
+          >
+            Nenhuma ata vinculada foi mantida na sessão atual. Acesse a busca na página inicial para
+            sincronizar as atas deste edital.
           </div>
         }
-      } @else {
-        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-6 text-center text-xs text-neutral-500 dark:text-neutral-400">
-          Nenhuma ata vinculada foi mantida na sessão atual. Acesse a busca na página inicial para sincronizar as atas deste edital.
-        </div>
       }
-    }
     </section>
   }
 </div>
