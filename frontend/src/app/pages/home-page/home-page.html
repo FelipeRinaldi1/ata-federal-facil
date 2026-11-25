@@ -18,7 +18,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
         
         <!-- Objeto -->
-        <div class="sm:col-span-2 lg:col-span-4">
+        <div class="sm:col-span-2 lg:col-span-5">
           <label for="campo-termo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
             Objeto do Edital
           </label>
@@ -31,6 +31,37 @@
             placeholder="Ex: mobiliário escolar, computadores..."
             class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-[#22863a]"
           />
+        </div>
+
+        <!-- Fornecedor (Autocomplete estilo PNCP) -->
+        <div class="sm:col-span-2 lg:col-span-5">
+          <label for="campo-fornecedor-home" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            Fornecedor
+          </label>
+          <app-fornecedor-autocomplete
+            inputId="campo-fornecedor-home"
+            placeholder="Digite razão social ou CNPJ para pesquisar no PNCP..."
+            [fornecedorSelecionado]="fornecedorSelecionado()"
+            (fornecedorChange)="onFornecedorChange($event)"
+            (buscarEnter)="executarBusca()"
+          ></app-fornecedor-autocomplete>
+        </div>
+
+        <!-- Vigência (Vigentes e Encerradas) -->
+        <div class="sm:col-span-2 lg:col-span-2">
+          <label for="campo-vigencia" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            Vigência das Atas
+          </label>
+          <select 
+            id="campo-vigencia"
+            [ngModel]="filtroVigencia()"
+            (ngModelChange)="filtroVigencia.set($event); paginaAtual.set(1)"
+            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+          >
+            <option value="todas">Vigentes e Encerradas</option>
+            <option value="vigentes">Apenas Vigentes</option>
+            <option value="encerradas">Apenas Encerradas</option>
+          </select>
         </div>
 
         <!-- UF do Órgão -->
@@ -52,7 +83,7 @@
         </div>
 
         <!-- Data Inicial -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-3">
           <label for="campo-data-inicial" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
             Publicado a partir de
           </label>
@@ -66,7 +97,7 @@
         </div>
 
         <!-- Data Final -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-3">
           <label for="campo-data-final" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
             Publicado até
           </label>
@@ -80,8 +111,8 @@
         </div>
 
         <!-- Profundidade da Busca -->
-        <div class="lg:col-span-1">
-          <label for="campo-profundidade" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 atas">
+        <div class="lg:col-span-2">
+          <label for="campo-profundidade" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 registros">
             Páginas
           </label>
           <select 
@@ -99,7 +130,7 @@
         </div>
 
         <!-- Botão Consultar -->
-        <div class="lg:col-span-1 flex items-end">
+        <div class="lg:col-span-2 flex items-end">
           <button 
             type="button"
             (click)="executarBusca()"
@@ -186,7 +217,7 @@
           </select>
         </div>
 
-        @if (filtroOrgao() || filtroUf() || filtroStatusAnalise() !== 'todos' || ordenacao() !== 'mais-atas') {
+        @if (filtroOrgao() || filtroUf() || filtroVigencia() !== 'todas' || fornecedorSelecionado() || filtroStatusAnalise() !== 'todos' || ordenacao() !== 'mais-atas' || dataInicial() || dataFinal()) {
           <button 
             type="button"
             (click)="limparFiltros()"
@@ -222,7 +253,10 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 px-1 text-xs text-neutral-600 dark:text-neutral-400">
       <div>
         Exibindo <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ estatisticas().totalPregoes }}</span> editais / pregões 
-        (<span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ estatisticas().totalAtas }}</span> atas vigentes com adesão permitida)
+        (<span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ estatisticas().totalAtas }}</span> atas:
+        <span class="text-[#1e7533] dark:text-emerald-400 font-medium">{{ estatisticas().totalVigentes }} vigentes</span>
+        ·
+        <span class="text-[#B91C1C] dark:text-red-400 font-medium">{{ estatisticas().totalEncerradas }} encerradas</span>)
       </div>
 
       <div class="flex items-center gap-3">
@@ -331,6 +365,10 @@
                       <span class="text-neutral-500 dark:text-neutral-500 font-mono">UASG: {{ pregao.uasg }}</span>
                     }
                     
+                    @if (contarVigentes(pregao.atasFiltradas) === 0 && contarEncerradas(pregao.atasFiltradas) > 0) {
+                      <span class="px-1.5 py-0.2 bg-red-50 dark:bg-red-950/40 text-[#B91C1C] dark:text-red-400 text-[10px] rounded font-medium border border-red-200 dark:border-red-900/60">Encerrada</span>
+                    }
+
                     @if (pregao.statusAnalise === 'analisado') {
                       <span class="px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-900/50 text-[#1e7533] dark:text-emerald-300 text-[10px] rounded font-medium border border-emerald-200 dark:border-emerald-800">Concluído</span>
                     } @else if (pregao.statusAnalise === 'em-analise') {
@@ -490,6 +528,10 @@
                             <span class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 font-medium text-[11px]">
                               Vence em breve ({{ ata.diasRestantes }} dias)
                             </span>
+                          } @else if (ata.statusVigencia === 'expirada') {
+                            <span class="px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-[#B91C1C] dark:text-red-400 border border-red-200 dark:border-red-900/60 font-medium text-[11px]">
+                              Encerrada
+                            </span>
                           }
 
                           @if (statusAnaliseService.isAtaAnalisada(ata.id)) {
@@ -508,7 +550,7 @@
 
                         <div class="text-neutral-500 dark:text-neutral-400 flex flex-wrap gap-x-3 text-[11px]">
                           @if (ata.vigenciaFim) {
-                            <span>Vence em: {{ ata.vigenciaFim | date:'dd/MM/yyyy' }}</span>
+                            <span>{{ ata.isVigente ? 'Vence em:' : 'Encerrou em:' }} {{ ata.vigenciaFim | date:'dd/MM/yyyy' }}</span>
                           }
                           @if (ata.valorTotal) {
                             <span>Valor: {{ ata.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>

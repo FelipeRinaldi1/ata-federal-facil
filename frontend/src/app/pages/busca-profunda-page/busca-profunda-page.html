@@ -7,7 +7,7 @@
         Busca Profunda de Itens e Produtos
       </h1>
       <p class="text-xs text-neutral-500 dark:text-neutral-400">
-        Varre sequencialmente os itens homologados e estimados de editais federais vigentes para fins de carona.
+        Varre sequencialmente os itens homologados e estimados de editais federais (atas vigentes e encerradas).
       </p>
     </div>
 
@@ -42,7 +42,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
       
       <!-- Objeto do Edital -->
-      <div class="sm:col-span-1 lg:col-span-3">
+      <div class="sm:col-span-1 lg:col-span-4">
         <label for="campo-objeto-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
           Objeto do Edital
         </label>
@@ -58,7 +58,7 @@
       </div>
 
       <!-- Item Específico -->
-      <div class="sm:col-span-1 lg:col-span-3">
+      <div class="sm:col-span-1 lg:col-span-4">
         <label for="campo-item-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
           Item Específico
         </label>
@@ -73,8 +73,39 @@
         />
       </div>
 
+      <!-- Fornecedor (Autocomplete estilo PNCP) -->
+      <div class="sm:col-span-2 lg:col-span-4">
+        <label for="campo-fornecedor-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Fornecedor
+        </label>
+        <app-fornecedor-autocomplete
+          inputId="campo-fornecedor-profundo"
+          placeholder="Razão social ou CNPJ no PNCP..."
+          [fornecedorSelecionado]="fornecedorSelecionado()"
+          (fornecedorChange)="onFornecedorChange($event)"
+          (buscarEnter)="iniciarVarredura()"
+        ></app-fornecedor-autocomplete>
+      </div>
+
+      <!-- Vigência das Atas -->
+      <div class="lg:col-span-3">
+        <label for="campo-vigencia-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Vigência das Atas
+        </label>
+        <select 
+          id="campo-vigencia-profundo"
+          [ngModel]="filtroVigencia()"
+          (ngModelChange)="filtroVigencia.set($event)"
+          class="w-full px-2 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded text-xs text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-[#22863a]"
+        >
+          <option value="todas">Vigentes e Encerradas</option>
+          <option value="vigentes">Apenas Vigentes</option>
+          <option value="encerradas">Apenas Encerradas</option>
+        </select>
+      </div>
+
       <!-- UF do Órgão -->
-      <div class="lg:col-span-1">
+      <div class="lg:col-span-2">
         <label for="campo-uf-profundo" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
           UF
         </label>
@@ -121,7 +152,7 @@
 
       <!-- Profundidade da Busca (Páginas de Atas no PNCP) -->
       <div class="lg:col-span-1">
-        <label for="campo-escopo-editais" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 atas no PNCP">
+        <label for="campo-escopo-editais" class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1" title="Quantidade de páginas de 20 registros no PNCP">
           Págs
         </label>
         <select 
@@ -139,7 +170,7 @@
       </div>
 
       <!-- Botão Ação -->
-      <div class="lg:col-span-1 flex items-end">
+      <div class="lg:col-span-2 flex items-end">
         @if (emExecucao()) {
           <button 
             type="button"

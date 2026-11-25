@@ -31,8 +31,24 @@ export interface PncpAtaSearchItem {
   cancelado?: boolean;
   valor_global?: number | null;
   permite_adesao?: boolean | null;
+  srp?: boolean | null;
+  tem_ata_registro_preco?: boolean | null;
+  fornecedor_id?: string | null;
   fornecedor_nome?: string | null;
   fornecedor_ni?: string | null;
+}
+
+export type FiltroVigencia = 'todas' | 'vigentes' | 'encerradas';
+
+export interface FornecedorSugestao {
+  id: string;
+  ni: string;
+  nome: string;
+  total?: number;
+}
+
+export interface PncpSuggestResponse {
+  items: FornecedorSugestao[];
 }
 
 export interface ItemCompraPncp {

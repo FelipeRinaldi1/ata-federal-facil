@@ -212,7 +212,7 @@ export class EditalPage implements OnInit {
             this.pregao.set({
               ...atual,
               atas,
-              atasFiltradas: atas.filter(a => a.isVigente && a.permiteAdesao),
+              atasFiltradas: atas.filter(a => a.permiteAdesao),
               totalAtas: atas.length,
               totalAtasVigentes: vigentes
             });

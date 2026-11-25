@@ -1,7 +1,19 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, map, of, catchError, from, concatMap, delay, switchMap, retry, toArray } from 'rxjs';
-import { PncpAtaSearchItem, PncpSearchResponse, PregaoAgrupado, AtaVinculada, DetalheCompraPncp, ItemCompraPncp, AtaPncpCompraDTO, ArquivoPublicacaoPncp } from '../models/pncp.models';
+import { Observable, map, of, catchError, from, concatMap, delay, switchMap, retry, toArray } from 'rxjs';
+import {
+  PncpAtaSearchItem,
+  PncpSearchResponse,
+  PncpSuggestResponse,
+  FornecedorSugestao,
+  FiltroVigencia,
+  PregaoAgrupado,
+  AtaVinculada,
+  DetalheCompraPncp,
+  ItemCompraPncp,
+  AtaPncpCompraDTO,
+  ArquivoPublicacaoPncp
+} from '../models/pncp.models';
 
 @Injectable({
   providedIn: 'root'
@@ -226,13 +238,67 @@ export class PncpService {
     );
   }
 
+  /**
+   * Autocomplete oficial do PNCP para fornecedores (/api/search/suggest).
+   * Remove pontos (padrão do portal PNCP) e exige no mínimo 3 caracteres.
+   */
+  sugerirFornecedores(termo: string, tamPagina: number = 20): Observable<FornecedorSugestao[]> {
+    const termoLimpo = (termo || '').replace(/\./g, '').trim();
+    if (termoLimpo.length < 3) {
+      return of([]);
+    }
+
+    const url = `${this.BASE_SEARCH_URL}suggest`;
+    const params: Record<string, string | number> = {
+      tipos_documento: 'edital',
+      campo: 'fornecedores',
+      q: termoLimpo,
+      tam_pagina: tamPagina
+    };
+
+    return this.http.get<PncpSuggestResponse>(url, { params }).pipe(
+      retry({ count: 1, delay: 300 }),
+      map(res => {
+        const itens = Array.isArray(res?.items) ? res.items : [];
+        return itens
+          .filter(it => it && it.id && (it.nome || it.ni))
+          .map(it => {
+            const niLimpo = (it.ni || '').replace(/\D/g, '');
+            const niFormatado = this.formatarCpfCnpj(niLimpo || it.ni || '');
+            let nomeLimpo = (it.nome || '').trim();
+            // Quando a busca é por CNPJ, o PNCP retorna "EMPRESA - 11666105000362"
+            if (niLimpo && nomeLimpo.endsWith(`- ${niLimpo}`)) {
+              nomeLimpo = nomeLimpo.slice(0, -(niLimpo.length + 2)).trim();
+            }
+            return {
+              id: String(it.id),
+              ni: niFormatado,
+              nome: nomeLimpo || niFormatado,
+              total: it.total
+            } as FornecedorSugestao;
+          });
+      }),
+      catchError(err => {
+        console.warn('Falha ao consultar sugestões de fornecedores no PNCP:', err);
+        return of([]);
+      })
+    );
+  }
+
+  private mapearStatusVigencia(filtroVigencia: FiltroVigencia): string {
+    if (filtroVigencia === 'vigentes') return 'vigente';
+    if (filtroVigencia === 'encerradas') return 'nao_vigente';
+    return 'todos';
+  }
+
   buscarAtas(
     termo: string,
     pagina: number = 1,
     tamPagina: number = 20,
     dataInicial?: string,
     dataFinal?: string,
-    uf?: string
+    uf?: string,
+    filtroVigencia: FiltroVigencia = 'todas'
   ): Observable<PncpSearchResponse> {
     const termoTratado = (termo || '').trim();
     const params: Record<string, string | number> = {
@@ -240,15 +306,11 @@ export class PncpService {
       tipos_documento: 'ata',
       esferas: 'F',               // Filtro PNCP: Esfera Federal
       modalidades: '6',           // Filtro PNCP: Pregão - Eletrônico
+      status: this.mapearStatusVigencia(filtroVigencia),
       pagina: pagina,
       tam_pagina: tamPagina,
       ordenacao: '-data'
     };
-
-    // Se a busca for ampla (sem termo específico), a API do PNCP exige o parâmetro status
-    if (!termoTratado) {
-      params['status'] = 'todas';
-    }
 
     if (uf) {
       params['ufs'] = uf.trim().toUpperCase();
@@ -264,6 +326,208 @@ export class PncpService {
   }
 
   /**
+   * Busca editais federais (Pregão Eletrônico) com Ata de Registro de Preços
+   * vinculados a um fornecedor específico no PNCP.
+   */
+  buscarEditaisPorFornecedor(
+    fornecedorId: string,
+    termo: string = '',
+    pagina: number = 1,
+    tamPagina: number = 20,
+    dataInicial?: string,
+    dataFinal?: string,
+    uf?: string
+  ): Observable<PncpSearchResponse> {
+    const termoTratado = (termo || '').trim();
+    const params: Record<string, string | number> = {
+      q: termoTratado,
+      tipos_documento: 'edital',
+      esferas: 'F',
+      modalidades: '6',
+      fornecedores: fornecedorId,
+      tem_ata_registro_preco: 'true',
+      status: 'todos',
+      pagina: pagina,
+      tam_pagina: tamPagina,
+      ordenacao: '-data'
+    };
+
+    if (uf) {
+      params['ufs'] = uf.trim().toUpperCase();
+    }
+    if (dataInicial) {
+      params['data_inicial'] = dataInicial.replace(/-/g, '');
+    }
+    if (dataFinal) {
+      params['data_final'] = dataFinal.replace(/-/g, '');
+    }
+
+    return this.http.get<PncpSearchResponse>(this.BASE_SEARCH_URL, { params });
+  }
+
+  /**
+   * Busca pregões federais de um fornecedor selecionado e carrega suas Atas reais
+   * via endpoint oficial /atas da compra, respeitando throttling anti-rate-limit.
+   */
+  buscarPregoesComAtasPorFornecedor(
+    fornecedor: FornecedorSugestao,
+    termo: string = '',
+    totalPaginas: number = 5,
+    dataInicial?: string,
+    dataFinal?: string,
+    uf?: string,
+    onProgresso?: (progresso: { atual: number; total: number; itensCarregados: number; mensagem?: string }) => void
+  ): Observable<PregaoAgrupado[]> {
+    const termoTratado = (termo || '').trim();
+    const paginas = Array.from({ length: totalPaginas }, (_, i) => i + 1);
+    const editaisColetados: PncpAtaSearchItem[] = [];
+    let esgotouPaginas = false;
+
+    return from(paginas).pipe(
+      concatMap((pagina, index) => {
+        if (esgotouPaginas) {
+          return of([]);
+        }
+        const delayMs = index === 0 ? 0 : 220 + Math.floor(Math.random() * 80);
+        return of(null).pipe(
+          delay(delayMs),
+          switchMap(() =>
+            this.buscarEditaisPorFornecedor(fornecedor.id, termoTratado, pagina, 20, dataInicial, dataFinal, uf)
+          ),
+          retry({ count: 2, delay: 450 }),
+          catchError(err => {
+            console.warn(`Página ${pagina} de editais do fornecedor ignorada:`, err);
+            return of({ items: [], total: 0 });
+          }),
+          map(res => {
+            const items = res?.items || [];
+            editaisColetados.push(...items);
+            if (items.length < 20 || (res?.total !== undefined && editaisColetados.length >= res.total)) {
+              esgotouPaginas = true;
+            }
+            if (onProgresso) {
+              onProgresso({
+                atual: pagina,
+                total: totalPaginas,
+                itensCarregados: editaisColetados.length,
+                mensagem: `Localizando editais do fornecedor (${editaisColetados.length} encontrado(s))...`
+              });
+            }
+            return items;
+          })
+        );
+      }),
+      toArray(),
+      switchMap(() => {
+        const editaisFederais = editaisColetados.filter(item => {
+          const esferaId = (item.esfera_id || '').toUpperCase();
+          const esferaNome = (item.esfera_nome || '').toLowerCase();
+          return esferaId === 'F' || esferaNome.includes('federal');
+        });
+
+        // Deduplica editais pela chave cnpj_ano_seqCompra
+        const mapaEditais = new Map<string, { item: PncpAtaSearchItem; cnpj: string; ano: number; seqCompra: string }>();
+        for (const item of editaisFederais) {
+          const cnpj = (item.orgao_cnpj || '').replace(/\D/g, '');
+          let ano = Number(item.ano) || new Date().getFullYear();
+          let seqCompra = item.numero_sequencial !== undefined && item.numero_sequencial !== null
+            ? String(item.numero_sequencial)
+            : '';
+
+          if (item.item_url) {
+            const matchCompra = item.item_url.match(/\/compras\/(\d+)\/(\d+)\/(\d+)/);
+            if (matchCompra) {
+              ano = Number(matchCompra[2]);
+              seqCompra = matchCompra[3];
+            }
+          }
+
+          if (!cnpj || !ano || !seqCompra) continue;
+          const chave = `${cnpj}_${ano}_${seqCompra}`;
+          if (!mapaEditais.has(chave)) {
+            mapaEditais.set(chave, { item, cnpj, ano, seqCompra });
+          }
+        }
+
+        const listaEditais = Array.from(mapaEditais.values());
+        if (listaEditais.length === 0) {
+          return of([]);
+        }
+
+        const totalEditais = listaEditais.length;
+        let processados = 0;
+
+        return from(listaEditais).pipe(
+          concatMap((entrada, idx) => {
+            const delayMs = idx === 0 ? 0 : 180 + Math.floor(Math.random() * 60);
+            return of(null).pipe(
+              delay(delayMs),
+              switchMap(() => this.consultarAtasDaCompra(entrada.cnpj, entrada.ano, entrada.seqCompra)),
+              map(atasBrutas => {
+                processados++;
+                if (onProgresso) {
+                  onProgresso({
+                    atual: processados,
+                    total: totalEditais,
+                    itensCarregados: processados,
+                    mensagem: `Carregando atas do edital ${processados} de ${totalEditais}...`
+                  });
+                }
+
+                const atas = atasBrutas.map(a => ({
+                  ...a,
+                  fornecedorNome: a.fornecedorNome || fornecedor.nome,
+                  fornecedorNi: a.fornecedorNi || fornecedor.ni
+                }));
+
+                const { item, cnpj, ano, seqCompra } = entrada;
+                const chavePregao = `${cnpj}_${ano}_${seqCompra}`;
+                const totalAtasVigentes = atas.filter(a => a.isVigente).length;
+                const maiorDiasVigencia = atas.reduce((max, a) => {
+                  const d = a.diasRestantes ?? -999999;
+                  return d > max ? d : max;
+                }, -999999);
+
+                const pregao: PregaoAgrupado = {
+                  chavePregao,
+                  cnpj,
+                  cnpjFormatado: this.formatarCnpj(cnpj),
+                  ano,
+                  seqCompra,
+                  nomeOrgao: item.orgao_nome || 'Órgão Desconhecido',
+                  uasg: item.unidade_codigo || item.codigo_unidade || undefined,
+                  unidadeNome: item.unidade_nome || undefined,
+                  uf: item.uf,
+                  municipio: item.municipio_nome,
+                  esfera: 'Federal',
+                  modalidadeNome: item.modalidade_licitacao_nome || 'Pregão - Eletrônico',
+                  linkPregaoPncp: `https://pncp.gov.br/app/editais/${cnpj}/${ano}/${seqCompra}`,
+                  objetoResumido: item.description || 'Aquisição de bens/serviços',
+                  dataPublicacao: item.data_publicacao_pncp,
+                  dataAssinatura: item.data_assinatura,
+                  maiorDiasVigencia: maiorDiasVigencia === -999999 ? 0 : maiorDiasVigencia,
+                  totalAtas: atas.length,
+                  totalAtasVigentes,
+                  atas,
+                  expandido: false
+                };
+
+                return pregao;
+              })
+            );
+          }),
+          toArray(),
+          map(pregoes =>
+            pregoes
+              .filter(p => p.atas.length > 0)
+              .sort((a, b) => (b.totalAtas - a.totalAtas) || (b.totalAtasVigentes - a.totalAtasVigentes))
+          )
+        );
+      })
+    );
+  }
+
+  /**
    * Busca sequencial com espaçamento de tempo (throttling + jitter) e retry automático
    * para contornar rate-limits (HTTP 429/500/Drop de conexão) do PNCP.
    */
@@ -273,7 +537,8 @@ export class PncpService {
     dataInicial?: string,
     dataFinal?: string,
     uf?: string,
-    onProgresso?: (progresso: { atual: number; total: number; itensCarregados: number }) => void
+    onProgresso?: (progresso: { atual: number; total: number; itensCarregados: number }) => void,
+    filtroVigencia: FiltroVigencia = 'todas'
   ): Observable<PncpAtaSearchItem[]> {
     const termoTratado = (termo || '').trim();
     const paginas = Array.from({ length: totalPaginas }, (_, i) => i + 1);
@@ -286,7 +551,7 @@ export class PncpService {
 
         return of(null).pipe(
           delay(delayMs),
-          switchMap(() => this.buscarAtas(termoTratado, pagina, 20, dataInicial, dataFinal, uf)),
+          switchMap(() => this.buscarAtas(termoTratado, pagina, 20, dataInicial, dataFinal, uf, filtroVigencia)),
           retry({
             count: 2,
             delay: 450 // se falhar/cair a conexão, tenta novamente após 450ms
@@ -455,11 +720,22 @@ export class PncpService {
       }
     }
 
-    return Array.from(mapPregoes.values()).sort((a, b) => b.totalAtasVigentes - a.totalAtasVigentes);
+    return Array.from(mapPregoes.values()).sort((a, b) => (b.totalAtas - a.totalAtas) || (b.totalAtasVigentes - a.totalAtasVigentes));
   }
 
   private formatarCnpj(cnpj: string): string {
     if (cnpj.length !== 14) return cnpj;
     return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  }
+
+  private formatarCpfCnpj(valor: string): string {
+    const digitos = (valor || '').replace(/\D/g, '');
+    if (digitos.length === 14) {
+      return this.formatarCnpj(digitos);
+    }
+    if (digitos.length === 11) {
+      return digitos.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    return valor;
   }
 }

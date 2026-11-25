@@ -3,7 +3,7 @@ import '@angular/compiler';
 import { describe, it, expect, vi } from 'vitest';
 import { PncpService } from './pncp.service';
 import { PncpAtaSearchItem } from '../models/pncp.models';
-import { of } from 'rxjs';
+import { of, firstValueFrom } from 'rxjs';
 
 describe('PncpService (Testes Unitários & Integração de Dados)', () => {
   const fakeHttp = {
@@ -153,7 +153,7 @@ describe('PncpService (Testes Unitários & Integração de Dados)', () => {
     expect(vencida?.statusVigencia).toBe('expirada');
   });
 
-  it('deve realizar busca no endpoint do PNCP com os parâmetros corretos', () => {
+  it('deve realizar busca no endpoint do PNCP com os parâmetros corretos (padrão vigentes e encerradas)', () => {
     fakeHttp.get.mockReturnValue(of({ items: [], total: 0 }));
 
     service.buscarAtas('mobiliário', 1, 20).subscribe();
@@ -166,10 +166,39 @@ describe('PncpService (Testes Unitários & Integração de Dados)', () => {
           tipos_documento: 'ata',
           esferas: 'F',
           modalidades: '6',
+          status: 'todos',
           pagina: 1,
           tam_pagina: 20,
           ordenacao: '-data'
         }
+      })
+    );
+  });
+
+  it('deve enviar status correto conforme filtro de vigência (vigentes, encerradas, todas)', () => {
+    fakeHttp.get.mockReturnValue(of({ items: [], total: 0 }));
+
+    service.buscarAtas('cadeira', 1, 20, undefined, undefined, undefined, 'vigentes').subscribe();
+    expect(fakeHttp.get).toHaveBeenLastCalledWith(
+      'https://pncp.gov.br/api/search/',
+      expect.objectContaining({
+        params: expect.objectContaining({ status: 'vigente' })
+      })
+    );
+
+    service.buscarAtas('cadeira', 1, 20, undefined, undefined, undefined, 'encerradas').subscribe();
+    expect(fakeHttp.get).toHaveBeenLastCalledWith(
+      'https://pncp.gov.br/api/search/',
+      expect.objectContaining({
+        params: expect.objectContaining({ status: 'nao_vigente' })
+      })
+    );
+
+    service.buscarAtas('cadeira', 1, 20, undefined, undefined, undefined, 'todas').subscribe();
+    expect(fakeHttp.get).toHaveBeenLastCalledWith(
+      'https://pncp.gov.br/api/search/',
+      expect.objectContaining({
+        params: expect.objectContaining({ status: 'todos' })
       })
     );
   });
@@ -187,6 +216,7 @@ describe('PncpService (Testes Unitários & Integração de Dados)', () => {
           tipos_documento: 'ata',
           esferas: 'F',
           modalidades: '6',
+          status: 'todos',
           pagina: 1,
           tam_pagina: 20,
           ordenacao: '-data',
@@ -196,6 +226,96 @@ describe('PncpService (Testes Unitários & Integração de Dados)', () => {
         }
       })
     );
+  });
+
+  it('deve consultar sugestões de fornecedores no /api/search/suggest removendo pontos e exigindo 3+ caracteres', () => {
+    fakeHttp.get.mockClear();
+
+    let curto: any[] = [];
+    service.sugerirFornecedores('de').subscribe(r => (curto = r));
+    expect(curto).toEqual([]);
+    expect(fakeHttp.get).not.toHaveBeenCalled();
+
+    fakeHttp.get.mockReturnValue(
+      of({
+        items: [
+          { id: '183071', ni: '11666105000362', nome: 'DELLAMED S.A. - 11666105000362', total: 16 }
+        ]
+      })
+    );
+
+    let sugestoes: any[] = [];
+    service.sugerirFornecedores('11.666.105').subscribe(r => (sugestoes = r));
+
+    expect(fakeHttp.get).toHaveBeenCalledWith(
+      'https://pncp.gov.br/api/search/suggest',
+      expect.objectContaining({
+        params: {
+          tipos_documento: 'edital',
+          campo: 'fornecedores',
+          q: '11666105',
+          tam_pagina: 20
+        }
+      })
+    );
+    expect(sugestoes.length).toBe(1);
+    expect(sugestoes[0].id).toBe('183071');
+    expect(sugestoes[0].nome).toBe('DELLAMED S.A.');
+    expect(sugestoes[0].ni).toBe('11.666.105/0003-62');
+  });
+
+  it('deve buscar pregões federais por fornecedor e carregar suas atas vinculadas', async () => {
+    const httpLocal = {
+      get: vi.fn().mockImplementation((url: string) => {
+        if (url === 'https://pncp.gov.br/api/search/') {
+          return of({
+            total: 1,
+            items: [
+              {
+                id: 'edital-1',
+                title: 'Edital nº 90014/2024',
+                description: 'Cadeiras hospitalares',
+                item_url: '/compras/15126437000143/2024/323',
+                ano: '2024',
+                numero_sequencial: '323',
+                orgao_cnpj: '15126437000143',
+                orgao_nome: 'EBSERH',
+                esfera_id: 'F',
+                esfera_nome: 'Federal',
+                uf: 'ES'
+              }
+            ]
+          });
+        }
+        return of({
+          data: [
+            {
+              numeroAtaRegistroPreco: '00068',
+              anoAta: 2024,
+              sequencialAta: 1,
+              dataVigenciaInicio: '2024-07-15',
+              dataVigenciaFim: '2025-07-15',
+              possibilidadeAdesao: true
+            }
+          ]
+        });
+      })
+    };
+
+    const localService = new PncpService(httpLocal as any);
+    const resultado = await firstValueFrom(
+      localService.buscarPregoesComAtasPorFornecedor(
+        { id: '183071', ni: '11.666.105/0003-62', nome: 'DELLAMED S.A.' },
+        '',
+        1
+      )
+    );
+
+    expect(resultado.length).toBe(1);
+    expect(resultado[0].chavePregao).toBe('15126437000143_2024_323');
+    expect(resultado[0].atas.length).toBe(1);
+    expect(resultado[0].atas[0].fornecedorNome).toBe('DELLAMED S.A.');
+    expect(resultado[0].atas[0].fornecedorNi).toBe('11.666.105/0003-62');
   });
 
   it('deve consultar itens da compra no endpoint oficial e utilizar cache', () => {

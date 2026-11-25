@@ -1,6 +1,7 @@
 import 'zone.js';
 import '@angular/compiler';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { of } from 'rxjs';
 import { HomePage } from './home-page';
 import { PncpService } from '../../services/pncp.service';
 import { StatusAnaliseService } from '../../services/status-analise.service';
@@ -13,17 +14,20 @@ describe('HomePage Component (Testes Unitários & Reatividade de Sinais)', () =>
   beforeEach(() => {
     localStorage.clear();
     fakeService = {
-      buscarMultiplasPaginas: vi.fn(),
-      agruparPorPregao: vi.fn(),
+      buscarMultiplasPaginas: vi.fn().mockReturnValue(of([])),
+      buscarPregoesComAtasPorFornecedor: vi.fn().mockReturnValue(of([])),
+      agruparPorPregao: vi.fn().mockReturnValue([]),
       salvarPregoesCache: vi.fn()
     };
     statusService = new StatusAnaliseService();
     homePage = new HomePage(fakeService, statusService);
   });
 
-  it('deve inicializar com busca padrao vazia e filtros zerados', () => {
+  it('deve inicializar com busca padrao vazia, vigencia em todas e filtros zerados', () => {
     expect(homePage.termoBusca()).toBe('');
     expect(homePage.filtroOrgao()).toBe('');
+    expect(homePage.filtroVigencia()).toBe('todas');
+    expect(homePage.fornecedorSelecionado()).toBeNull();
     expect(homePage.filtroStatusAnalise()).toBe('todos');
   });
 
@@ -173,40 +177,40 @@ describe('HomePage Component (Testes Unitários & Reatividade de Sinais)', () =>
     expect(homePage.pregoesFiltrados()[0].nomeOrgao).toContain('SAO PAULO');
   });
 
-  it('deve ocultar pregões que não possuem atas vigentes e com adesão permitida', () => {
+  it('deve exibir atas vigentes e encerradas por padrão e permitir filtrar por vigência (mantendo filtro de adesão)', () => {
     homePage.filtroOrgao.set('');
 
     homePage.todosPregoes.set([
       {
-        chavePregao: 'valido',
+        chavePregao: 'valido-vigente',
         cnpj: '111',
         cnpjFormatado: '111',
         ano: 2026,
         seqCompra: '1',
-        nomeOrgao: 'Órgão Válido',
+        nomeOrgao: 'Órgão Vigente',
         esfera: 'Federal',
         linkPregaoPncp: '',
         objetoResumido: '',
         totalAtas: 1,
         totalAtasVigentes: 1,
         atas: [
-          { id: '1', isVigente: true, permiteAdesao: true, seqAta: '1', titulo: 'Ata', numeroAta: '1', ano: 2026, urlAtaPncp: '', objeto: '', statusVigencia: 'vigente' }
+          { id: '1', isVigente: true, permiteAdesao: true, seqAta: '1', titulo: 'Ata Vigente', numeroAta: '1', ano: 2026, urlAtaPncp: '', objeto: '', statusVigencia: 'vigente' }
         ]
       },
       {
-        chavePregao: 'invalido-expirado',
+        chavePregao: 'valido-encerrado',
         cnpj: '222',
         cnpjFormatado: '222',
-        ano: 2026,
+        ano: 2024,
         seqCompra: '2',
-        nomeOrgao: 'Órgão Expirado',
+        nomeOrgao: 'Órgão Encerrado',
         esfera: 'Federal',
         linkPregaoPncp: '',
         objetoResumido: '',
         totalAtas: 1,
         totalAtasVigentes: 0,
         atas: [
-          { id: '2', isVigente: false, permiteAdesao: true, seqAta: '2', titulo: 'Ata', numeroAta: '2', ano: 2026, urlAtaPncp: '', objeto: '', statusVigencia: 'expirada' }
+          { id: '2', isVigente: false, permiteAdesao: true, seqAta: '2', titulo: 'Ata Encerrada', numeroAta: '2', ano: 2024, urlAtaPncp: '', objeto: '', statusVigencia: 'expirada' }
         ]
       },
       {
@@ -222,14 +226,42 @@ describe('HomePage Component (Testes Unitários & Reatividade de Sinais)', () =>
         totalAtas: 1,
         totalAtasVigentes: 1,
         atas: [
-          { id: '3', isVigente: true, permiteAdesao: false, seqAta: '3', titulo: 'Ata', numeroAta: '3', ano: 2026, urlAtaPncp: '', objeto: '', statusVigencia: 'vigente' }
+          { id: '3', isVigente: true, permiteAdesao: false, seqAta: '3', titulo: 'Ata Sem Carona', numeroAta: '3', ano: 2026, urlAtaPncp: '', objeto: '', statusVigencia: 'vigente' }
         ]
       }
     ]);
 
-    const resultado = homePage.pregoesFiltrados();
-    expect(resultado.length).toBe(1);
-    expect(resultado[0].chavePregao).toBe('valido');
+    // Padrão ('todas'): exibe vigentes e encerradas, mas oculta quem veda adesão
+    expect(homePage.pregoesFiltrados().length).toBe(2);
+    expect(homePage.estatisticas().totalVigentes).toBe(1);
+    expect(homePage.estatisticas().totalEncerradas).toBe(1);
+
+    // Apenas Vigentes
+    homePage.filtroVigencia.set('vigentes');
+    expect(homePage.pregoesFiltrados().length).toBe(1);
+    expect(homePage.pregoesFiltrados()[0].chavePregao).toBe('valido-vigente');
+
+    // Apenas Encerradas
+    homePage.filtroVigencia.set('encerradas');
+    expect(homePage.pregoesFiltrados().length).toBe(1);
+    expect(homePage.pregoesFiltrados()[0].chavePregao).toBe('valido-encerrado');
+  });
+
+  it('deve acionar busca por fornecedor quando um fornecedor estiver selecionado', () => {
+    const fornecedor = { id: '183071', ni: '11.666.105/0003-62', nome: 'DELLAMED S.A.' };
+    homePage.onFornecedorChange(fornecedor);
+    homePage.executarBusca();
+
+    expect(fakeService.buscarPregoesComAtasPorFornecedor).toHaveBeenCalledWith(
+      fornecedor,
+      '',
+      5,
+      undefined,
+      undefined,
+      undefined,
+      expect.any(Function)
+    );
+    expect(fakeService.buscarMultiplasPaginas).not.toHaveBeenCalled();
   });
 
   it('deve destacar termos no texto em negrito sem adicionar estilos chamativos', () => {

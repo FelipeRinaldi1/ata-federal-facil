@@ -4,12 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PncpService } from '../../services/pncp.service';
 import { StatusAnaliseService } from '../../services/status-analise.service';
-import { PregaoAgrupado, AtaVinculada, CriterioOrdenacao, ItemCompraPncp } from '../../models/pncp.models';
+import {
+  PregaoAgrupado,
+  AtaVinculada,
+  CriterioOrdenacao,
+  FiltroVigencia,
+  FornecedorSugestao
+} from '../../models/pncp.models';
+import { FornecedorAutocompleteComponent } from '../../components/fornecedor-autocomplete/fornecedor-autocomplete';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, FornecedorAutocompleteComponent],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css'
 })
@@ -43,6 +50,8 @@ export class HomePage {
 
   // Parâmetros de Busca na API
   termoBusca = signal<string>('');
+  fornecedorSelecionado = signal<FornecedorSugestao | null>(null);
+  filtroVigencia = signal<FiltroVigencia>('todas'); // 'todas' (Vigentes e Encerradas) | 'vigentes' | 'encerradas'
   filtroUf = signal<string>('');
   dataInicial = signal<string>('');
   dataFinal = signal<string>('');
@@ -70,18 +79,23 @@ export class HomePage {
   // Notificação Copiar
   feedbackCopiado = signal<string | null>(null);
 
-  // Lista Filtrada Reativa (Regras Fixas: Esfera Federal + Pregão Eletrônico + Permite Adesão = Sim + Apenas Vigentes = Sim)
+  // Lista Filtrada Reativa (Regras Fixas: Esfera Federal + Pregão Eletrônico + Permite Adesão = Sim; Vigência selecionável)
   pregoesFiltrados = computed(() => {
     const pregoes = this.todosPregoes();
     const orgaoTerm = this.normalizar(this.filtroOrgao());
     const statusFiltro = this.filtroStatusAnalise();
+    const vigenciaFiltro = this.filtroVigencia();
     // Invocamos signal de atasAnalisadas para reatividade instantânea ao clicar no check
     const _setAnalise = this.statusAnaliseService.atasAnalisadas();
 
     return pregoes
       .map(p => {
-        // Regra fixa: apenas atas vigentes e que permitem adesão (carona)
-        const atasFiltradas = p.atas.filter(a => a.isVigente && a.permiteAdesao);
+        const atasFiltradas = p.atas.filter(a => {
+          if (!a.permiteAdesao) return false;
+          if (vigenciaFiltro === 'vigentes') return a.isVigente;
+          if (vigenciaFiltro === 'encerradas') return !a.isVigente;
+          return true;
+        });
         const atasIds = atasFiltradas.map(a => a.id);
         const statusAnalise = this.statusAnaliseService.getPregaoStatus(atasIds);
 
@@ -135,16 +149,21 @@ export class HomePage {
     const list = this.pregoesFiltrados();
     let totalAtasExibidas = 0;
     let totalVigentes = 0;
+    let totalEncerradas = 0;
 
     for (const p of list) {
       totalAtasExibidas += p.atasFiltradas.length;
-      totalVigentes += p.atasFiltradas.filter(a => a.isVigente).length;
+      for (const ata of p.atasFiltradas) {
+        if (ata.isVigente) totalVigentes++;
+        else totalEncerradas++;
+      }
     }
 
     return {
       totalPregoes: list.length,
       totalAtas: totalAtasExibidas,
-      totalVigentes
+      totalVigentes,
+      totalEncerradas
     };
   });
 
@@ -158,11 +177,65 @@ export class HomePage {
     }
   }
 
+  onFornecedorChange(fornecedor: FornecedorSugestao | null) {
+    this.fornecedorSelecionado.set(fornecedor);
+  }
+
+  contarVigentes(atas?: AtaVinculada[]): number {
+    if (!atas) return 0;
+    return atas.filter(a => a.isVigente).length;
+  }
+
+  contarEncerradas(atas?: AtaVinculada[]): number {
+    if (!atas) return 0;
+    return atas.filter(a => !a.isVigente).length;
+  }
+
   executarBusca() {
     const termo = this.termoBusca().trim();
+    const fornecedor = this.fornecedorSelecionado();
 
     this.carregando.set(true);
     this.erro.set(null);
+    this.paginaAtual.set(1);
+
+    if (fornecedor) {
+      this.progressoCarregamento.set(`Buscando atas do fornecedor ${fornecedor.nome}...`);
+      this.pncpService.buscarPregoesComAtasPorFornecedor(
+        fornecedor,
+        termo,
+        this.totalPaginas(),
+        this.dataInicial() || undefined,
+        this.dataFinal() || undefined,
+        this.filtroUf() || undefined,
+        (prog) => {
+          this.progressoCarregamento.set(
+            prog.mensagem || `Processando ${prog.atual} de ${prog.total}...`
+          );
+        }
+      ).subscribe({
+        next: (agrupados) => {
+          this.todosPregoes.set(agrupados);
+          this.pncpService.salvarPregoesCache(agrupados);
+          this.carregando.set(false);
+          this.progressoCarregamento.set('');
+
+          if (agrupados.length === 0) {
+            this.erro.set(
+              `Nenhuma ata federal encontrada para o fornecedor "${fornecedor.nome}" com os filtros aplicados.`
+            );
+          }
+        },
+        error: (err) => {
+          console.error('Erro na requisição PNCP por fornecedor:', err);
+          this.erro.set('Falha na comunicação com o PNCP. Tente novamente em instantes.');
+          this.carregando.set(false);
+          this.progressoCarregamento.set('');
+        }
+      });
+      return;
+    }
+
     this.progressoCarregamento.set(`Consultando página 1 de ${this.totalPaginas()}...`);
 
     this.pncpService.buscarMultiplasPaginas(
@@ -173,7 +246,8 @@ export class HomePage {
       this.filtroUf() || undefined,
       (prog) => {
         this.progressoCarregamento.set(`Página ${prog.atual} de ${prog.total} (${prog.itensCarregados} atas coletadas)`);
-      }
+      },
+      this.filtroVigencia()
     ).subscribe({
       next: (itens) => {
         // Agrupa garantindo APENAS Esfera Federal
@@ -266,6 +340,8 @@ export class HomePage {
   limparFiltros() {
     this.filtroOrgao.set('');
     this.filtroUf.set('');
+    this.filtroVigencia.set('todas');
+    this.fornecedorSelecionado.set(null);
     this.filtroStatusAnalise.set('todos');
     this.ordenacao.set('mais-atas');
     this.dataInicial.set('');
@@ -289,8 +365,8 @@ export class HomePage {
   private aplicarOrdenacao(a: PregaoAgrupado, b: PregaoAgrupado, criterio: CriterioOrdenacao): number {
     switch (criterio) {
       case 'maior-vigencia': {
-        const vigA = Math.max(...(a.atasFiltradas || a.atas).map(x => x.diasRestantes || 0), 0);
-        const vigB = Math.max(...(b.atasFiltradas || b.atas).map(x => x.diasRestantes || 0), 0);
+        const vigA = Math.max(...(a.atasFiltradas || a.atas).map(x => x.diasRestantes ?? -999999), -999999);
+        const vigB = Math.max(...(b.atasFiltradas || b.atas).map(x => x.diasRestantes ?? -999999), -999999);
         return vigB - vigA;
       }
 

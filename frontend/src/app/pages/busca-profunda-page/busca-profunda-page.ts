@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subscription, from, concatMap, delay, of, catchError } from 'rxjs';
 import { PncpService } from '../../services/pncp.service';
-import { ItemBuscaProfunda, PregaoAgrupado } from '../../models/pncp.models';
+import { FiltroVigencia, FornecedorSugestao, ItemBuscaProfunda, PregaoAgrupado } from '../../models/pncp.models';
+import { FornecedorAutocompleteComponent } from '../../components/fornecedor-autocomplete/fornecedor-autocomplete';
 
 @Component({
   selector: 'app-busca-profunda-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, FornecedorAutocompleteComponent],
   templateUrl: './busca-profunda-page.html',
   styleUrl: './busca-profunda-page.css'
 })
@@ -34,6 +35,8 @@ export class BuscaProfundaPage {
   // Parâmetros de Busca
   termoObjeto = signal<string>(''); // Termo pesquisado no Objeto/Cabeçalho no PNCP
   termoItem = signal<string>('');   // Termo refinado para encontrar nos Itens específicos da compra
+  fornecedorSelecionado = signal<FornecedorSugestao | null>(null);
+  filtroVigencia = signal<FiltroVigencia>('todas'); // 'todas' | 'vigentes' | 'encerradas'
   filtroUf = signal<string>('');
   dataInicial = signal<string>('');
   dataFinal = signal<string>('');
@@ -134,12 +137,18 @@ export class BuscaProfundaPage {
     }, 0);
   });
 
+  onFornecedorChange(fornecedor: FornecedorSugestao | null) {
+    this.fornecedorSelecionado.set(fornecedor);
+  }
+
   iniciarVarredura() {
     const objeto = this.termoObjeto().trim();
     const item = this.termoItem().trim();
+    const fornecedor = this.fornecedorSelecionado();
+    const vigencia = this.filtroVigencia();
 
-    if (!objeto && !item) {
-      this.erro.set('Preencha ao menos o Objeto ou o Item desejado para realizar a pesquisa.');
+    if (!objeto && !item && !fornecedor) {
+      this.erro.set('Preencha ao menos o Objeto, o Item desejado ou selecione um Fornecedor para realizar a pesquisa.');
       return;
     }
 
@@ -153,10 +162,56 @@ export class BuscaProfundaPage {
     this.progressoAtual.set(0);
     this.progressoTotal.set(0);
     this.paginaAtual.set(1);
-    this.mensagemStatus.set('Consultando atas e editais federais vigentes...');
+
+    const filtrarPorVigencia = (pregoes: PregaoAgrupado[]) =>
+      pregoes.filter(p =>
+        p.atas.some(a => {
+          if (!a.permiteAdesao) return false;
+          if (vigencia === 'vigentes') return a.isVigente;
+          if (vigencia === 'encerradas') return !a.isVigente;
+          return true;
+        })
+      );
 
     // Termo enviado na requisição geral do PNCP (usa Objeto se preenchido, senão o termo do Item)
     const termoPncp = objeto || item;
+
+    if (fornecedor) {
+      this.mensagemStatus.set(`Consultando editais e atas do fornecedor ${fornecedor.nome}...`);
+      this.pncpService.buscarPregoesComAtasPorFornecedor(
+        fornecedor,
+        termoPncp,
+        this.totalPaginas(),
+        this.dataInicial() || undefined,
+        this.dataFinal() || undefined,
+        this.filtroUf() || undefined,
+        prog => {
+          if (prog.mensagem) {
+            this.mensagemStatus.set(prog.mensagem);
+          }
+        }
+      ).subscribe({
+        next: (pregoes) => {
+          const pregoesValidos = filtrarPorVigencia(pregoes);
+          if (pregoesValidos.length === 0) {
+            this.emExecucao.set(false);
+            this.mensagemStatus.set('');
+            this.erro.set(`Nenhum edital federal encontrado para o fornecedor "${fornecedor.nome}" com os filtros aplicados.`);
+            return;
+          }
+          this.executarVarreduraItens(pregoesValidos, item);
+        },
+        error: (err) => {
+          console.error('Erro na etapa 1 da busca profunda por fornecedor:', err);
+          this.emExecucao.set(false);
+          this.mensagemStatus.set('');
+          this.erro.set('Falha ao consultar editais no PNCP. Verifique a conexão e tente novamente.');
+        }
+      });
+      return;
+    }
+
+    this.mensagemStatus.set('Consultando atas e editais federais...');
 
     // Passo 1: Busca atas/editais do PNCP com os mesmos filtros e profundidade de páginas da busca de editais
     this.pncpService.buscarMultiplasPaginas(
@@ -164,17 +219,18 @@ export class BuscaProfundaPage {
       this.totalPaginas(),
       this.dataInicial() || undefined,
       this.dataFinal() || undefined,
-      this.filtroUf() || undefined
+      this.filtroUf() || undefined,
+      undefined,
+      vigencia
     ).subscribe({
       next: (itensPncp) => {
         const pregoes = this.pncpService.agruparPorPregao(itensPncp, true);
-        const pregoesValidos = pregoes
-          .filter(p => p.atas.some(a => a.isVigente && a.permiteAdesao));
+        const pregoesValidos = filtrarPorVigencia(pregoes);
 
         if (pregoesValidos.length === 0) {
           this.emExecucao.set(false);
           this.mensagemStatus.set('');
-          this.erro.set(`Nenhum edital federal vigente com carona encontrado para o critério informado. Tente alterar os filtros ou aumentar o número de páginas.`);
+          this.erro.set(`Nenhum edital federal encontrado para o critério informado. Tente alterar os filtros ou aumentar o número de páginas.`);
           return;
         }
 

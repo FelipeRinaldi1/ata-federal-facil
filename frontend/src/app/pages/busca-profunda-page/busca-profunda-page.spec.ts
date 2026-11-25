@@ -1,6 +1,7 @@
 import 'zone.js';
 import '@angular/compiler';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { of } from 'rxjs';
 import { BuscaProfundaPage } from './busca-profunda-page';
 
 describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
@@ -9,9 +10,10 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
 
   beforeEach(() => {
     fakeService = {
-      buscarMultiplasPaginas: vi.fn(),
-      agruparPorPregao: vi.fn(),
-      consultarItensCompra: vi.fn()
+      buscarMultiplasPaginas: vi.fn().mockReturnValue(of([])),
+      buscarPregoesComAtasPorFornecedor: vi.fn().mockReturnValue(of([])),
+      agruparPorPregao: vi.fn().mockReturnValue([]),
+      consultarItensCompra: vi.fn().mockReturnValue(of([]))
     };
     page = new BuscaProfundaPage(fakeService);
   });
@@ -19,6 +21,8 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
   it('deve inicializar com valores padrao de configuracao', () => {
     expect(page.termoObjeto()).toBe('');
     expect(page.termoItem()).toBe('');
+    expect(page.filtroVigencia()).toBe('todas');
+    expect(page.fornecedorSelecionado()).toBeNull();
     expect(page.totalPaginas()).toBe(5);
     expect(page.dataInicial()).toBe('');
     expect(page.dataFinal()).toBe('');
@@ -26,12 +30,29 @@ describe('BuscaProfundaPage Component (Varredura e Filtragem de Itens)', () => {
     expect(page.todosItensEncontrados().length).toBe(0);
   });
 
-  it('deve exibir mensagem de erro se tentar iniciar sem termo no objeto e sem item', () => {
+  it('deve exibir mensagem de erro se tentar iniciar sem objeto, item e fornecedor', () => {
     page.termoObjeto.set('   ');
     page.termoItem.set('');
+    page.fornecedorSelecionado.set(null);
     page.iniciarVarredura();
-    expect(page.erro()).toContain('Preencha ao menos o Objeto ou o Item');
+    expect(page.erro()).toContain('Preencha ao menos o Objeto, o Item desejado ou selecione um Fornecedor');
     expect(page.emExecucao()).toBe(false);
+  });
+
+  it('deve permitir iniciar varredura informando apenas um Fornecedor', () => {
+    const fornecedor = { id: '183071', ni: '11.666.105/0003-62', nome: 'DELLAMED S.A.' };
+    page.onFornecedorChange(fornecedor);
+    page.iniciarVarredura();
+
+    expect(fakeService.buscarPregoesComAtasPorFornecedor).toHaveBeenCalledWith(
+      fornecedor,
+      '',
+      5,
+      undefined,
+      undefined,
+      undefined,
+      expect.any(Function)
+    );
   });
 
   it('deve filtrar reativamente itens por nome do orgao e refino de descricao', () => {
